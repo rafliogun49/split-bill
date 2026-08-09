@@ -183,6 +183,25 @@ export function BillEditorScreen({ bill, onBillChange, onContinue, reconciliatio
             {bill.lineItems.length === 0 && (
               <p className="py-4 text-body-md text-on-surface-variant">{copy.billEditor.lineItemsEmpty}</p>
             )}
+            {bill.lineItems.length > 0 && (
+              // The single column header for the rows below (issue #25) — one
+              // row, not repeated per LineItemRow. aria-hidden because each
+              // field already carries its own accessible name ("Quantity —
+              // <item name>" etc, LineItemRow); this is a sighted-only label
+              // aligned to the same w-32/flex-1/flex-1 gap-3 columns as the
+              // quantity/unit-price/line-total row inside each LineItemRow.
+              <div aria-hidden="true" className="flex items-end gap-3 px-4 pb-1">
+                <span className="w-32 text-label-sm uppercase text-on-surface-variant">
+                  {copy.billEditor.quantity}
+                </span>
+                <span className="flex-1 text-right text-label-sm uppercase text-on-surface-variant">
+                  {copy.billEditor.unitPrice}
+                </span>
+                <span className="flex-1 text-right text-label-sm uppercase text-on-surface-variant">
+                  {copy.billEditor.lineTotal}
+                </span>
+              </div>
+            )}
             {bill.lineItems.map((item, index) => (
               <LineItemRow
                 key={item.id}

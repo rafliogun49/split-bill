@@ -14,8 +14,8 @@ function baseItem(overrides: Partial<LineItem> = {}): LineItem {
 function noop() {}
 
 // A thin stateful wrapper — like the real parent — so a sequence of
-// keystrokes each sees the item as it stood after the previous one, the way
-// a live onChange -> re-render loop behaves.
+// stepper clicks each sees the item as it stood after the previous one, the
+// way a live onChange -> re-render loop behaves.
 function StatefulLineItemRow({ initial }: { initial: LineItem }) {
   const [item, setItem] = useState(initial)
   return (
@@ -34,7 +34,7 @@ function StatefulLineItemRow({ initial }: { initial: LineItem }) {
 
 describe('LineItemRow', () => {
   it('renders the line item name, quantity and line total', () => {
-    const { getByDisplayValue, getByLabelText } = render(
+    const { getByDisplayValue, getByRole, getByLabelText } = render(
       <LineItemRow
         item={baseItem()}
         currency={currency}
@@ -47,7 +47,7 @@ describe('LineItemRow', () => {
       />,
     )
     expect(getByDisplayValue('Nasi Goreng Spesial')).toBeInTheDocument()
-    expect(getByLabelText(/quantity/i)).toHaveValue('1')
+    expect(getByRole('group', { name: 'Nasi Goreng Spesial' })).toHaveTextContent('1')
     expect(getByLabelText(/line total/i)).toHaveValue('Rp 90.000')
   })
 
@@ -69,22 +69,49 @@ describe('LineItemRow', () => {
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ label: 'Es Teh Manis' }))
   })
 
-  it('fills the line total by multiplying quantity and unit price', () => {
-    const onChange = vi.fn()
-    const { getByLabelText } = render(
+  it('quantity is entered via a Stepper, not a free-text field', () => {
+    const { queryByLabelText, getByRole } = render(
       <LineItemRow
-        item={baseItem({ amount: 12000, quantity: 1 })}
+        item={baseItem()}
         currency={currency}
         canMoveUp={false}
         canMoveDown={false}
-        onChange={onChange}
+        onChange={noop}
         onRemove={noop}
         onMoveUp={noop}
         onMoveDown={noop}
       />,
     )
-    fireEvent.change(getByLabelText(/quantity/i), { target: { value: '3' } })
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ quantity: 3, amount: 36000 }))
+    expect(queryByLabelText(/quantity/i, { selector: 'input, textarea' })).not.toBeInTheDocument()
+    expect(getByRole('button', { name: /increase quantity.*nasi goreng spesial/i })).toBeInTheDocument()
+    expect(getByRole('button', { name: /decrease quantity.*nasi goreng spesial/i })).toBeInTheDocument()
+  })
+
+  it('disables the stepper decrement control once quantity reaches zero, so it can never go negative', () => {
+    const { getByRole } = render(
+      <LineItemRow
+        item={baseItem({ quantity: 0 })}
+        currency={currency}
+        canMoveUp={false}
+        canMoveDown={false}
+        onChange={noop}
+        onRemove={noop}
+        onMoveUp={noop}
+        onMoveDown={noop}
+      />,
+    )
+    expect(getByRole('button', { name: /decrease quantity.*nasi goreng spesial/i })).toBeDisabled()
+  })
+
+  it("recomputes the line total against the item's last-known unit price as the stepper is incremented", () => {
+    const { getByLabelText, getByRole } = render(
+      <StatefulLineItemRow initial={baseItem({ amount: 12000, quantity: 1 })} />,
+    )
+    const increase = getByRole('button', { name: /increase quantity.*nasi goreng spesial/i })
+    fireEvent.click(increase)
+    fireEvent.click(increase)
+    // Unit price was 12000 / 1 = 12000; quantity is now 3.
+    expect(getByLabelText(/line total/i)).toHaveValue('Rp 36.000')
   })
 
   it('lets the line total be overridden independently of quantity and unit price', () => {
@@ -143,22 +170,17 @@ describe('LineItemRow', () => {
     expect(getByRole('button', { name: /move down/i })).toBeEnabled()
   })
 
-  it('does not corrupt the unit price after quantity passes through zero mid-edit', () => {
-    const { getByLabelText } = render(
+  it('does not corrupt the unit price after quantity passes through zero via the stepper', () => {
+    const { getByLabelText, getByRole } = render(
       <StatefulLineItemRow initial={baseItem({ amount: 900000, quantity: 10 })} />,
     )
-    const quantity = getByLabelText(/quantity/i)
-    fireEvent.change(quantity, { target: { value: '0' } })
-    fireEvent.change(quantity, { target: { value: '2' } })
+    // Unit price is 900000 / 10 = 90000.
+    const decrease = getByRole('button', { name: /decrease quantity.*nasi goreng spesial/i })
+    const increase = getByRole('button', { name: /increase quantity.*nasi goreng spesial/i })
+    for (let i = 0; i < 10; i += 1) fireEvent.click(decrease)
+    fireEvent.click(increase)
+    fireEvent.click(increase)
     expect(getByLabelText(/line total/i)).toHaveValue('Rp 180.000')
-  })
-
-  it('resyncs the quantity field to the real value on blur after an invalid edit', () => {
-    const { getByLabelText } = render(<StatefulLineItemRow initial={baseItem({ quantity: 5 })} />)
-    const quantity = getByLabelText(/quantity/i)
-    fireEvent.change(quantity, { target: { value: '' } })
-    fireEvent.blur(quantity)
-    expect(quantity).toHaveValue('5')
   })
 
   it('has no WCAG AAA violations', async () => {

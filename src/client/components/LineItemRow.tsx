@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import type { ChangeEvent } from 'react'
+import { useRef } from 'react'
 import type { Currency, LineItem } from '../../domain'
 import { AmountField } from './AmountField'
 import { ChevronIcon, TrashIcon } from '../icons'
+import { Stepper } from './Stepper'
 import { TextField } from './TextField'
 import { focusRing } from './focusRing'
 import { copy } from '../copy'
@@ -29,34 +29,27 @@ function unitPriceOf(item: LineItem): number {
 }
 
 // DESIGN.md screen 5: name + delete on one line, quantity/unit price/line
-// total on the next. Entering quantity or unit price fills the line total by
-// simple multiplication of two already-integer minor-unit values (exact, no
-// rounding) — the Split arithmetic itself stays entirely in the domain layer.
+// total on the next. Quantity is a Stepper (issue #21/#25) rather than
+// free-text — the domain layer already treats quantity as display-only
+// (CONTEXT.md: "quantity is carried for display and never used to derive
+// money"), and free-text let a keystroke silently overwrite an
+// already-correct line total. Changing the stepper still fills the line
+// total by simple multiplication of two already-integer minor-unit values
+// (exact, no rounding) — the Split arithmetic itself stays entirely in the
+// domain layer.
 export function LineItemRow({ item, currency, canMoveUp, canMoveDown, onChange, onRemove, onMoveUp, onMoveDown }: LineItemRowProps) {
   const name = item.label.trim() || copy.billEditor.lineItemFallbackName
-  const [quantityDraft, setQuantityDraft] = useState(String(item.quantity))
 
   // The last known positive unit price, kept across a transient quantity of
-  // 0 (e.g. deleting a leading digit mid-edit) so the next digit multiplies
-  // the real per-unit price rather than a stale total (unitPriceOf falls
-  // back to 0 exactly to keep that stale total out of this ref).
+  // 0 (e.g. the stepper floored at zero mid-adjustment) so the next
+  // increment multiplies the real per-unit price rather than a stale total
+  // (unitPriceOf falls back to 0 exactly to keep that stale total out of
+  // this ref).
   const lastUnitPriceRef = useRef(unitPriceOf(item))
   if (item.quantity > 0) lastUnitPriceRef.current = unitPriceOf(item)
 
-  useEffect(() => {
-    setQuantityDraft(String(item.quantity))
-  }, [item.quantity])
-
-  function handleQuantityChange(event: ChangeEvent<HTMLInputElement>) {
-    const raw = event.target.value
-    setQuantityDraft(raw)
-    const parsed = Number.parseInt(raw, 10)
-    if (!Number.isFinite(parsed) || parsed < 0) return
-    onChange({ ...item, quantity: parsed, amount: parsed > 0 ? lastUnitPriceRef.current * parsed : item.amount })
-  }
-
-  function handleQuantityBlur() {
-    setQuantityDraft(String(item.quantity))
+  function handleQuantityChange(nextQuantity: number) {
+    onChange({ ...item, quantity: nextQuantity, amount: nextQuantity > 0 ? lastUnitPriceRef.current * nextQuantity : item.amount })
   }
 
   function handleUnitPriceChange(nextUnitPrice: number) {
@@ -108,14 +101,13 @@ export function LineItemRow({ item, currency, canMoveUp, canMoveDown, onChange, 
         </button>
       </div>
       <div className="flex items-end gap-3">
-        <div className="w-16">
-          <TextField
-            label={`${copy.billEditor.quantity} — ${name}`}
-            hideLabel
-            inputMode="numeric"
-            value={quantityDraft}
+        <div className="w-32">
+          <Stepper
+            label={name}
+            value={item.quantity}
             onChange={handleQuantityChange}
-            onBlur={handleQuantityBlur}
+            increaseLabel={copy.billEditor.increaseQuantity}
+            decreaseLabel={copy.billEditor.decreaseQuantity}
           />
         </div>
         <div className="flex-1">
