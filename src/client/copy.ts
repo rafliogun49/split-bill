@@ -114,4 +114,15 @@ export const copy = {
     divideRemainder: 'Split the rest between everyone',
     continueToSummary: 'Summary',
   },
+  summary: {
+    heading: 'Summary',
+    isOwed: 'is owed',
+    billTotal: 'Bill total',
+    payLine: 'Pay',
+    shareText: 'Share summary',
+    shareTextCopied: 'Summary copied to clipboard',
+    shareImage: 'Share image',
+    shareImageCopied: 'Image copied to clipboard',
+    shareImageDownloaded: 'Image downloaded',
+  },
 } as const

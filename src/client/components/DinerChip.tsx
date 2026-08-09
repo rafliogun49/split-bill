@@ -1,4 +1,5 @@
 import { copy } from '../copy'
+import { dinerFillClass } from '../dinerFill'
 
 export interface DinerChipProps {
   name: string
@@ -13,20 +14,10 @@ export interface DinerChipProps {
 
 // DESIGN.md §8: 44x44 square, diner-N fill, black border, initial in
 // label-bold. Claimed carries shadow-sm; unclaimed carries none, so the two
-// states never depend on fill alone. Literal class names below (not
-// template-built) so Tailwind's content scan can see every diner-N utility.
-const dinerFill = [
-  'bg-diner-1',
-  'bg-diner-2',
-  'bg-diner-3',
-  'bg-diner-4',
-  'bg-diner-5',
-  'bg-diner-6',
-] as const
-
+// states never depend on fill alone.
 export function DinerChip({ name, joinIndex, claimed = true, shareCount, isPayer }: DinerChipProps) {
   const initial = name.trim().charAt(0) || '?'
-  const fill = dinerFill[joinIndex % dinerFill.length]
+  const fill = dinerFillClass(joinIndex)
   const label = isPayer ? `${name} — ${copy.dinerSetup.payerBadge}` : name
 
   return (
