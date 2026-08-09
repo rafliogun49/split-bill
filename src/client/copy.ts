@@ -19,5 +19,36 @@ export const copy = {
     newBillWarningBody: 'Starting a New Bill discards the current Bill. This cannot be undone.',
     confirmNewBill: 'Discard and start new',
     cancelNewBill: 'Cancel',
+    howItWorksTitle: 'How it works',
+    howItWorks: [
+      {
+        title: 'Photograph the receipt',
+        body: 'Snap a photo, or enter items by hand. Either way, nothing leaves your device.',
+      },
+      {
+        title: 'Tag who had what',
+        body: 'Assign each Line Item to a Diner. Shared plates split between everyone with a tap.',
+      },
+      {
+        title: 'Get your Split',
+        body: 'Adjustments are shared pro-rata by what each Diner ordered — automatically, every time.',
+      },
+    ],
+    featuresTitle: 'Why Split Bill',
+    features: [
+      {
+        title: 'Nothing stored',
+        body: 'No accounts, no server holding your Bill. It exists only on this device.',
+      },
+      {
+        title: 'Fair by default',
+        body: 'The Split accounts for exactly what each Diner ordered, not an even share.',
+      },
+      {
+        title: 'No sign-up',
+        body: 'Open it and start. No account, no install, nothing to wait on.',
+      },
+    ],
+    footerTagline: 'No accounts. Nothing leaves your device.',
   },
 } as const

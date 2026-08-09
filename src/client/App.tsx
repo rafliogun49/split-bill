@@ -13,9 +13,11 @@ type Screen = 'start' | 'in-progress'
 // Resume loop is demonstrable end to end before they exist.
 function InProgressPlaceholder() {
   return (
-    <Card>
-      <p className="text-body-md text-on-surface">{copy.inProgressPlaceholder}</p>
-    </Card>
+    <div className="flex flex-1 items-center justify-center p-6">
+      <Card>
+        <p className="text-body-md text-on-surface">{copy.inProgressPlaceholder}</p>
+      </Card>
+    </div>
   )
 }
 
@@ -31,7 +33,7 @@ export function App() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <TopBar onExit={screen === 'in-progress' ? () => setScreen('start') : undefined} />
-      <main className="flex flex-1 items-center justify-center p-6">
+      <main className="flex flex-1 flex-col">
         {screen === 'start' ? (
           <StartScreen
             hasActiveBill={bill !== null}

@@ -35,6 +35,14 @@ describe('StartScreen', () => {
       expect(onPhotograph).toHaveBeenCalledOnce()
       expect(onEnterManually).toHaveBeenCalledOnce()
     })
+
+    it('presents How it works and Features as a landing page for a first-time visitor', () => {
+      const { getByRole, getByText } = renderScreen(false)
+      expect(getByRole('heading', { name: 'How it works' })).toBeInTheDocument()
+      expect(getByRole('heading', { name: 'Why Split Bill' })).toBeInTheDocument()
+      expect(getByText('Tag who had what')).toBeInTheDocument()
+      expect(getByText('Nothing stored')).toBeInTheDocument()
+    })
   })
 
   describe('with a Bill in progress', () => {
@@ -43,6 +51,12 @@ describe('StartScreen', () => {
       const buttons = getAllByRole('button')
       expect(buttons[0]).toHaveTextContent('Resume')
       expect(buttons[1]).toHaveTextContent('New Bill')
+    })
+
+    it('drops the landing content once a Bill exists', () => {
+      const { queryByRole } = renderScreen(true)
+      expect(queryByRole('heading', { name: 'How it works' })).not.toBeInTheDocument()
+      expect(queryByRole('heading', { name: 'Why Split Bill' })).not.toBeInTheDocument()
     })
 
     it('calls onResume directly', () => {
