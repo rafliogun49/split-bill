@@ -11,3 +11,14 @@ const localeByCurrency: Record<string, string> = {
 export function localeForCurrency(currencyCode: string): string {
   return localeByCurrency[currencyCode] ?? 'en-US'
 }
+
+// Bill.date is an ISO "YYYY-MM-DD" string from a <input type="date">. Parsed
+// via its parts rather than `new Date(iso)` — the latter reads as UTC
+// midnight, which rolls back a day in any timezone behind UTC.
+export function formatDate(dateIso: string, locale: string): string {
+  const [year, month, day] = dateIso.split('-').map(Number)
+  if (!year || !month || !day) return dateIso
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(
+    new Date(year, month - 1, day),
+  )
+}

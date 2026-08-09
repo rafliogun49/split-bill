@@ -88,3 +88,19 @@ export function ChevronIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function ShareIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M18 16.1a3 3 0 0 0-2 .77l-6.1-3.55a3 3 0 0 0 0-1.24l6.02-3.5a3 3 0 1 0-1-2.2l-6.02 3.5a3 3 0 1 0 0 4.24l6.1 3.55A3 3 0 1 0 18 16.1Z" />
+    </svg>
+  )
+}
+
+export function CopyIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M8 3h9a2 2 0 0 1 2 2v9h-2V5H8V3ZM4 7h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v10h9V9H4Z" />
+    </svg>
+  )
+}

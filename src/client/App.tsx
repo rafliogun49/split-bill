@@ -8,12 +8,12 @@ import { AssignmentScreen } from './screens/AssignmentScreen'
 import { BillEditorScreen } from './screens/BillEditorScreen'
 import { DinerSetupScreen } from './screens/DinerSetupScreen'
 import { StartScreen } from './screens/StartScreen'
+import { SummaryScreen } from './screens/SummaryScreen'
 
-type Screen = 'start' | 'editor' | 'diner-setup' | 'assignment' | 'in-progress'
+type Screen = 'start' | 'editor' | 'diner-setup' | 'assignment' | 'summary' | 'in-progress'
 
-// The remaining screens (Capture, Summary) land in later issues — this is a
-// holding screen so the Photograph path and post-Assignment flow are
-// demonstrable end to end before Summary and parsing exist.
+// Capture (issue #11, AI parsing) lands in a later issue — this is a holding
+// screen so the Photograph entry point is demonstrable before parsing exists.
 function InProgressPlaceholder() {
   return (
     <div className="flex flex-1 items-center justify-center p-6">
@@ -68,7 +68,9 @@ export function App() {
         ) : screen === 'diner-setup' && bill ? (
           <DinerSetupScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('assignment')} />
         ) : screen === 'assignment' && bill ? (
-          <AssignmentScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('in-progress')} />
+          <AssignmentScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('summary')} />
+        ) : screen === 'summary' && bill ? (
+          <SummaryScreen bill={bill} />
         ) : (
           <InProgressPlaceholder />
         )}
