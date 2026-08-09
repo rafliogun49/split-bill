@@ -115,43 +115,47 @@ export function DinerSetupScreen({ bill, onBillChange, onContinue }: DinerSetupS
           </Button>
         </form>
 
-        <div className="mt-6 flex flex-col">
-          {bill.diners.length === 0 && (
-            <p className="py-4 text-body-md text-on-surface-variant">{copy.dinerSetup.dinersEmpty}</p>
-          )}
-          {bill.diners.map((diner) => {
-            const isPayer = bill.payerId === diner.id
-            return (
-              <div key={diner.id} className="flex items-center gap-3 border-b border-pure-black py-3 last:border-b-0">
-                <DinerChip name={diner.name} joinIndex={diner.joinIndex} isPayer={isPayer} />
-                <div className="flex-1">
+        {bill.diners.length === 0 ? (
+          <p className="mt-6 py-4 text-body-md text-on-surface-variant">{copy.dinerSetup.dinersEmpty}</p>
+        ) : (
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {bill.diners.map((diner) => {
+              const isPayer = bill.payerId === diner.id
+              return (
+                <div
+                  key={diner.id}
+                  className="flex flex-col gap-3 border border-pure-black bg-surface-container-lowest p-4 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <DinerChip name={diner.name} joinIndex={diner.joinIndex} isPayer={isPayer} />
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(diner.id)}
+                      aria-label={`${copy.dinerSetup.removeDiner} ${diner.name}`}
+                      className={`p-2 text-on-surface ${focusRing}`}
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
                   <TextField
                     label={`${copy.dinerSetup.renameDiner} — ${diner.name}`}
                     hideLabel
                     value={diner.name}
                     onChange={(event) => handleRename(diner.id, event.target.value)}
                   />
+                  <Button
+                    variant={isPayer ? 'primary' : 'secondary'}
+                    aria-pressed={isPayer}
+                    aria-label={`${isPayer ? copy.dinerSetup.unmarkAsPayer : copy.dinerSetup.markAsPayer} — ${diner.name}`}
+                    onClick={() => handleTogglePayer(diner.id)}
+                  >
+                    {isPayer ? copy.dinerSetup.unmarkAsPayer : copy.dinerSetup.markAsPayer}
+                  </Button>
                 </div>
-                <Button
-                  variant={isPayer ? 'primary' : 'secondary'}
-                  aria-pressed={isPayer}
-                  aria-label={`${isPayer ? copy.dinerSetup.unmarkAsPayer : copy.dinerSetup.markAsPayer} — ${diner.name}`}
-                  onClick={() => handleTogglePayer(diner.id)}
-                >
-                  {isPayer ? copy.dinerSetup.unmarkAsPayer : copy.dinerSetup.markAsPayer}
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => handleRemove(diner.id)}
-                  aria-label={`${copy.dinerSetup.removeDiner} ${diner.name}`}
-                  className={`p-2 text-on-surface ${focusRing}`}
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </Card>
 
       <Button variant="primary" onClick={onContinue} disabled={bill.diners.length === 0 || hasBlankName}>
