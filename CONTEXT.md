@@ -34,6 +34,10 @@ _Avoid_: Venue, merchant, location, vendor, restaurant
 When a Bill was incurred. Defaults to today and is otherwise set by hand. Like Place, it is context for the shared Split and never affects arithmetic.
 _Avoid_: Timestamp, created at, when
 
+**History**:
+The local, on-device list of past Bills — each a Bill that reached its Summary or was discarded by starting a New Bill. Read-only: opening an entry shows its Summary again, never the live editor. Never an account, never synced, never sent anywhere.
+_Avoid_: Account, saved bills, cloud backup, past splits
+
 ### Dividing the money
 
 **Share**:

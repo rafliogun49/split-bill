@@ -165,7 +165,7 @@ rest                 hover (pointer only)      press / active
 - **Hover is pointer-only.** Guard with `@media (hover: hover)`. On touch it fires on tap and sticks.
 - **Focus** is a 4px black outline offset 4px outside the border. Never removed.
 - **Disabled** is `disabled` fill, no shadow, no translate.
-- Transitions: 200ms hover, 100ms press. Nothing else animates.
+- Transitions: 200ms hover, 100ms press. Nothing else animates — with two scoped exceptions, both places trying to hold attention rather than report a state change: Start's pre-Bill landing content (§9 screen 1) may use entrance and hover motion (fade/slide-in, a hover lift on cards, a tilt on the receipt ornament), and Parsing (§9 screen 3) may pulse its active step and icon badge. Every screen in the chromeless flow — Start's Resume/New-Bill choice onward — stays exactly this strict.
 
 ---
 
@@ -193,7 +193,9 @@ Once a Bill exists, the app is a **chromeless linear flow**: one top bar, no bot
 └────────────────────────┘                7 cols            5 cols
 ```
 
-**No accounts, no history, no groups, no pricing.** A Diner "exists only as a name within one Bill." Nav destinations implying otherwise are out of scope and must not be added back.
+**No accounts, no groups, no pricing, no server-side history.** A Diner "exists only as a name within one Bill." Nav destinations implying an account or a server ever holds your data are out of scope and must not be added back.
+
+**Exception: local History.** The device may keep a list of past Bills entirely in `localStorage` — nothing leaves the browser, there is no login and no sync between devices. A Bill archives into it when it reaches Summary or is discarded by starting a New Bill; entries are view-only (they reopen a Summary, never the live editor). Reachable everywhere via a single TopBar icon (§8 TopBar, §9 screen 12) — it does not reintroduce a nav bar or the marketing links this rule otherwise forbids. See ADR-0008.
 
 ---
 
@@ -230,7 +232,7 @@ Fifteen. No component library — these are hand-built against the tokens above.
 
 **`Card`** — white fill, 4px border, `shadow-lg`. The universal container.
 
-**`TopBar`** — sticky, white, bottom border only, wordmark left, exit/restart right. No navigation.
+**`TopBar`** — sticky, white, bottom border only, wordmark left, a History icon and exit/restart right. Those two destinations — History and back to Start — are the only navigation it ever carries.
 
 **`LineItemRow`** — the Bill editor's row (screen 5): inline-editable name, quantity, unit price and line total, plus reorder and remove controls. Entering quantity or unit price fills the line total; the line total is overridable and authoritative.
 
@@ -276,7 +278,7 @@ Flow order. Screens 1–5, 8 and 10 have Stitch evidence; the rest are specified
 For a screen with Stitch evidence, start from its export in `docs/design/stitch-design.md` — same structure, same component boundaries — and fix it up via the §11 checklist. Only screens without evidence are designed from the prose below.
 
 ```
-Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─┐
+Start ─┬─ scan ──────→ Capture ─→ Parsing ─┬─ Failure ─┐
        └─ enter manually ────────────────────┼──────────┘
                                              ↓
                           Bill editor + Reconciliation
@@ -286,9 +288,13 @@ Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─�
                         Assignment + Incomplete Split
                                              ↓
                                         Summary ─→ Share image
+
+History (screen 12) sits outside this line — a TopBar icon reaches it from
+any screen, and it always returns to a read-only Summary, never rejoins the
+flow above.
 ```
 
-**1 · Start** — first visit is a short landing page: hero (wordmark, tagline, the two entry points with photograph dominant as a large icon-led button, and the "your photo is never stored" line), a three-step How it works, a handful of Features, and a one-line footer repeating the no-accounts promise. No nav bar, no external links — there's nothing else in the app to link to. Once a Bill exists, Start drops the landing content for the minimal choice it always was: *Resume* over *New Bill*, and *New Bill* warns that it discards the current one before acting on it.
+**1 · Start** — first visit is a short landing page: hero (wordmark, tagline, the two entry points with scan dominant as a large icon-led button, and the "your photo is never stored" line), a three-step How it works, a handful of Features, and a one-line footer repeating the no-accounts promise. No nav bar, no external links — there's nothing else in the app to link to. Once a Bill exists, Start drops the landing content for the minimal choice it always was: *Resume* over *New Bill*, and *New Bill* warns that it discards the current one before acting on it.
 
 **2 · Capture** — mobile opens the camera directly with a library fallback. Desktop cannot assume a camera, so a drag-and-drop file zone is primary and webcam secondary. *Enter manually instead* stays reachable.
 
@@ -319,6 +325,8 @@ Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─�
 
 **11 · Share image** — the one non-responsive surface. Rendered from the `ShareCard` DOM node to PNG at a fixed width, so it must read standalone: Place and Date at the top, every Diner's Total with items, who to pay, and no app chrome, buttons or navigation. Inline the fonts — a webfont that hasn't loaded renders into the PNG as a fallback.
 
+**12 · History** — reached from the TopBar icon on any screen, never part of the linear flow above. A list of past Bills — Place, Date, Total, when it was archived — newest first, built entirely from `localStorage`. Tapping one reopens its Summary (screen 10) read-only; nothing in History is editable, and there is no route back into the live editor from here. Empty state explains it fills in as Bills are finished or discarded (ADR-0008).
+
 ---
 
 ## 10. Known risks
@@ -327,7 +335,7 @@ Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─�
 
 **The picker costs gestures.** Assigning a Line Item is open → set → close, so a 12-item Bill is roughly 36 gestures against 15 for always-visible chips. This was chosen deliberately for density and for rows that stay readable at six Diners. If it feels slow in use, the fix is chips on a second line inside each row, not a faster picker.
 
-**Six screens have no rendered evidence.** Screens 6, 7, 9, 11, plus the Adjustments half of 5, are specified from the product spec and this token system alone. Worth running through Stitch and revising. Screen 1 is now implemented directly in code (`StartScreen.tsx`) rather than from a Stitch export.
+**Screens have no rendered evidence.** 6, 7, 9, 11, 12, plus the Adjustments half of 5, are specified from the product spec and this token system alone. Worth running through Stitch and revising. Screen 1 is now implemented directly in code (`StartScreen.tsx`) rather than from a Stitch export. Screen 12 (History) is new enough that it has no Stitch prompt at all yet.
 
 ---
 
@@ -342,7 +350,8 @@ Stitch reliably reintroduces these. Check every one before merging an export.
 - [ ] `darkMode: "class"` and no-op `dark:` utilities
 - [ ] `outline`, `primary`, `error`, `on-*` or `mint-green` referenced
 - [ ] `primary-container` used as a Diner colour
-- [ ] Nav offering History, Groups, Pricing or API; a footer with links to pages the app doesn't have (Privacy, Terms, social) — Start's own one-line footer is the only exception
+- [ ] Nav offering Groups, Pricing or API; a footer with links to pages the app doesn't have (Privacy, Terms, social) — Start's own one-line footer is the only exception
+- [ ] An *account-backed* History — login, sync, "your bills" tied to an identity. The one local-History TopBar icon (§8, §9 screen 12) is the only History affordance, and it stays view-only, local, and account-free (ADR-0008)
 - [ ] `cdn.tailwindcss.com`; duplicate Google Fonts `<link>`s
 - [ ] `lh3.googleusercontent.com` placeholder images
 - [ ] "Settle Up", "Split Sheet", "The Party", "Participant", "Total Owed"
