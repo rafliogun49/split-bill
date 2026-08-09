@@ -5,13 +5,14 @@ import { TopBar } from './components/TopBar'
 import { copy } from './copy'
 import { clearBill, loadBill, saveBill } from './persistence/billStorage'
 import { BillEditorScreen } from './screens/BillEditorScreen'
+import { DinerSetupScreen } from './screens/DinerSetupScreen'
 import { StartScreen } from './screens/StartScreen'
 
-type Screen = 'start' | 'editor' | 'in-progress'
+type Screen = 'start' | 'editor' | 'diner-setup' | 'in-progress'
 
-// The remaining screens (Capture, Diner setup, Assignment, Summary) land in
-// later issues — this is a holding screen so the Photograph path is
-// demonstrable end to end before Capture and parsing exist.
+// The remaining screens (Capture, Assignment, Summary) land in later issues
+// — this is a holding screen so the Photograph and Diner-setup paths are
+// demonstrable end to end before Assignment and parsing exist.
 function InProgressPlaceholder() {
   return (
     <div className="flex flex-1 items-center justify-center p-6">
@@ -62,7 +63,9 @@ export function App() {
             onNewBill={handleNewBill}
           />
         ) : screen === 'editor' && bill ? (
-          <BillEditorScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('in-progress')} />
+          <BillEditorScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('diner-setup')} />
+        ) : screen === 'diner-setup' && bill ? (
+          <DinerSetupScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('in-progress')} />
         ) : (
           <InProgressPlaceholder />
         )}

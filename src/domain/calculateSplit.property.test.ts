@@ -49,7 +49,7 @@ const billArb: fc.Arbitrary<Bill> = fc
     adjustments: fc.array(adjustmentArb, { minLength: 0, maxLength: 4 }),
   })
   .map(({ dinerIds, lineItems, adjustments }): Bill => {
-    const diners: Diner[] = dinerIds.map((id) => ({ id, name: id }))
+    const diners: Diner[] = dinerIds.map((id, index) => ({ id, name: id, joinIndex: index }))
     return { currency: { code: 'SGD' }, diners, lineItems, adjustments }
   })
 

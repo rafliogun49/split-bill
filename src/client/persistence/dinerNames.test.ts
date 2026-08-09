@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { loadRememberedDinerNames, rememberDinerName } from './dinerNames'
+import { forgetDinerName, loadRememberedDinerNames, rememberDinerName } from './dinerNames'
 
 describe('dinerNames', () => {
   beforeEach(() => {
@@ -41,5 +41,18 @@ describe('dinerNames', () => {
   it('discards corrupt JSON instead of throwing', () => {
     localStorage.setItem('split-bill:diner-names', '{not json')
     expect(() => loadRememberedDinerNames()).not.toThrow()
+  })
+
+  it('forgets a name, leaving the rest untouched', () => {
+    rememberDinerName('Budi')
+    rememberDinerName('Sarah')
+    forgetDinerName('Budi')
+    expect(loadRememberedDinerNames()).toEqual(['Sarah'])
+  })
+
+  it('forgetting a name that was never remembered is a no-op', () => {
+    rememberDinerName('Sarah')
+    forgetDinerName('Nobody')
+    expect(loadRememberedDinerNames()).toEqual(['Sarah'])
   })
 })
