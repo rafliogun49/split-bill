@@ -31,8 +31,8 @@ src/server/
                        off the client (ADR-0001).
 
 src/client/
-  screens/             The 11 screens named in DESIGN.md §9 (issues #5-#10).
-  components/          The 14 shared components named in DESIGN.md §8.
+  screens/             The 11 screens named in DESIGN.md §9 (issues #5-#11).
+  components/          The 15 shared components named in DESIGN.md §8.
   persistence/         Bill <-> localStorage seam (ADR-0001) — loadBill()/saveBill()/clearBill(),
                        so swapping in D1 later touches this module only.
   main.tsx             Entry point.
@@ -53,7 +53,7 @@ Tailwind's theme carries Material 3 token names at pastel values (ADR-0007) — 
 |---|---|---|
 | `OPENROUTER_API_KEY` | secret | `.dev.vars` locally, `wrangler secret put OPENROUTER_API_KEY` in prod |
 | `TURNSTILE_SECRET_KEY` | secret | `.dev.vars` locally, `wrangler secret put TURNSTILE_SECRET_KEY` in prod |
-| `TURNSTILE_SITE_KEY` | non-secret, client-facing | `.dev.vars` locally (lands in `wrangler.jsonc` `vars` when the client widget ships in issue #11) |
+| `TURNSTILE_SITE_KEY` | non-secret, client-facing | `wrangler.jsonc` — defaults to Cloudflare's "always passes" test key; served to the client via `GET /api/config`. Replace with the account's real site key before deploying to production. |
 | `OPENROUTER_MODEL_DEFAULT` | var | `wrangler.jsonc` — `google/gemini-3.1-flash-lite` |
 | `OPENROUTER_MODEL_ESCALATION` | var | `wrangler.jsonc` — `google/gemini-3.5-flash` |
 | `PARSE_RATE_LIMITER` | ratelimit binding | `wrangler.jsonc` — 10 requests / 60s per key (caller IP) |

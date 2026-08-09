@@ -16,7 +16,12 @@
     // OpenRouter key and Turnstile secret are true secrets and live in
     // .dev.vars locally / `wrangler secret put` in prod, never here.
     "OPENROUTER_MODEL_DEFAULT": "google/gemini-3.1-flash-lite",
-    "OPENROUTER_MODEL_ESCALATION": "google/gemini-3.5-flash"
+    "OPENROUTER_MODEL_ESCALATION": "google/gemini-3.5-flash",
+    // Turnstile site keys are meant to be public (issue #11's Capture screen
+    // hands this to the client via GET /api/config). This is Cloudflare's
+    // published "always passes, invisible" test key — replace with the
+    // account's real site key before deploying to production.
+    "TURNSTILE_SITE_KEY": "1x00000000000000000000BB"
   },
   "ratelimits": [
     {

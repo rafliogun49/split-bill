@@ -97,6 +97,16 @@ export function ShareIcon({ className }: IconProps) {
   )
 }
 
+// The desktop Capture screen's drag-and-drop affordance (DESIGN.md §8 icon
+// set: `upload`).
+export function UploadIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M11 4h2v9h-2V4Zm-4.6 4.4L12 3.8l5.6 5.6L16.2 10.8 13 7.6V13h-2V7.6l-3.2 3.2L6.4 8.4ZM4 15h2v3h12v-3h2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3Z" />
+    </svg>
+  )
+}
+
 export function CopyIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">

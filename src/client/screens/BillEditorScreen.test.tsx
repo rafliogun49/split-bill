@@ -132,4 +132,67 @@ describe('BillEditorScreen', () => {
     const { container } = render(<BillEditorScreen bill={bill} onBillChange={noop} onContinue={noop} />)
     expect(await axe(container)).toHaveNoViolations()
   })
+
+  describe('reconciliation banner', () => {
+    it('shows no banner at all when the Bill was entered by hand', () => {
+      const { queryByRole } = render(<BillEditorScreen bill={emptyBill()} onBillChange={noop} onContinue={noop} />)
+      expect(queryByRole('status')).not.toBeInTheDocument()
+      expect(queryByRole('alert')).not.toBeInTheDocument()
+    })
+
+    it('shows no banner when the Receipt had no printed total to check against', () => {
+      const { queryByRole } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'no-printed-total', computedTotal: 55000 }}
+        />,
+      )
+      expect(queryByRole('status')).not.toBeInTheDocument()
+      expect(queryByRole('alert')).not.toBeInTheDocument()
+    })
+
+    it('renders a quiet neutral one-liner on a match', () => {
+      const { getByRole, getByText } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'match', computedTotal: 55000 }}
+        />,
+      )
+      expect(getByRole('status')).toBeInTheDocument()
+      expect(getByText('Matches the receipt total.')).toBeInTheDocument()
+    })
+
+    it('renders computed, printed and the signed difference on a mismatch', () => {
+      const { getByRole, getByText } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'mismatch', computedTotal: 156177, printedTotal: 159100, difference: -2923 }}
+        />,
+      )
+      const banner = getByRole('alert')
+      expect(banner).toBeInTheDocument()
+      expect(getByText("Doesn't match the receipt")).toBeInTheDocument()
+      expect(getByText('Rp 156.177')).toBeInTheDocument()
+      expect(getByText('Rp 159.100')).toBeInTheDocument()
+      expect(getByText(/2\.923/)).toBeInTheDocument()
+    })
+
+    it('has no WCAG AAA violations with a mismatch banner shown', async () => {
+      const { container } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'mismatch', computedTotal: 156177, printedTotal: 159100, difference: -2923 }}
+        />,
+      )
+      expect(await axe(container)).toHaveNoViolations()
+    })
+  })
 })

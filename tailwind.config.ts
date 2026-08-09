@@ -45,7 +45,20 @@ export default {
     borderWidth,
     borderColor: { DEFAULT: colors['pure-black'], ...colors },
     boxShadow,
-    extend: {},
+    extend: {
+      keyframes: {
+        // ProgressCard's indeterminate fill (DESIGN.md screen 3): a
+        // sliding block rather than a percentage, since the stage it
+        // represents has no knowable completion fraction.
+        'progress-indeterminate': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(400%)' },
+        },
+      },
+      animation: {
+        'progress-indeterminate': 'progress-indeterminate 1.2s ease-in-out infinite',
+      },
+    },
   },
   plugins: [typeScalePlugin],
 } satisfies Config
