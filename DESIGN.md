@@ -226,7 +226,7 @@ Adjustments are **never assignable**. They are allocated pro-rata by Subtotal, a
 
 ## 8. Components
 
-Fifteen. No component library — these are hand-built against the tokens above.
+Sixteen. No component library — these are hand-built against the tokens above.
 
 **`Button`** — `primary` (`primary-container` fill), `secondary` (white fill), `danger` (`error-container` fill), `disabled`. All four carry black text and `shadow-md`. Minimum height 48px.
 
@@ -236,7 +236,7 @@ Fifteen. No component library — these are hand-built against the tokens above.
 
 **`LineItemRow`** — the Bill editor's row (screen 5): inline-editable name, quantity, unit price and line total, plus reorder and remove controls. Entering quantity or unit price fills the line total; the line total is overridable and authoritative.
 
-**`AssignmentLineItemRow`** — the Assignment screen's row (screen 8): read-only name, quantity, line total, claimed `DinerChip`s, chevron. ~72px tall. Tapping anywhere opens `AssignmentPicker`. Unclaimed rows show a `+person` icon in place of chips. A distinct component from `LineItemRow` rather than a shared one, since one edits the Line Item and the other only opens the picker onto it.
+**`AssignmentLineItemRow`** — the Assignment screen's row (screen 8): read-only name, quantity, line total, claimed `DinerChip`s, chevron. ~72px tall at ≥1024px; below that it splits across two lines (name/quantity, then chips/amount/chevron) since the row no longer shares its width with a desktop summary column. Tapping anywhere opens `AssignmentPicker`. Unclaimed rows show a `+person` icon in place of chips. A distinct component from `LineItemRow` rather than a shared one, since one edits the Line Item and the other only opens the picker onto it.
 
 **`DinerChip`** — 44×44 square, `diner-N` fill, black border, initial in `label-bold`. Claimed carries `shadow-sm`; unclaimed carries none. A Share count above 1 renders as a superscript badge in the top-right corner. Claimed/unclaimed must never depend on fill alone.
 
@@ -248,7 +248,9 @@ Fifteen. No component library — these are hand-built against the tokens above.
 
 **`Banner`** — full-width, 4px border, `shadow-md`. `neutral` (white) and `alert` (`error-container`) only. Carries reconciliation state, Incomplete Split and parse failure.
 
-**`StickySummaryBar`** — mobile only. Fixed to the bottom edge, upward shadow, label + `amount-md` left, primary `Button` right. Becomes the right-hand column ≥1024px.
+**`StickySummaryBar`** — mobile only. Fixed to the bottom edge, upward shadow, label + `amount-md` left, primary `Button` right. Becomes the static foot of the right-hand column ≥1024px, pinned below `AssignmentDinerTotals`.
+
+**`AssignmentDinerTotals`** — desktop only (≥1024px), the right-hand column's header on the Assignment screen (screen 8): a `Card` naming each Diner with a `DinerChip`, next to their live running Total from the same `Split` the screen already computed. Sits above `StickySummaryBar` in that column, sticky under the `TopBar`; mobile has no equivalent, since the fixed `StickySummaryBar` there already carries the one number that matters before Continue.
 
 **`ProgressCard`** — parsing state. Determinate track in `surface-variant`, fill in `primary-container`, plus a step list. Cancel is a `secondary` Button.
 
@@ -317,7 +319,7 @@ flow above.
 
 **7 · Diner setup** — `NameChip`s of remembered names above a text field; current Diners as removable chips carrying their `diner-N` colour; one markable as Payer. Removing a Diner removes their Shares with them.
 
-**8 · Assignment** — `LineItemRow` list in Receipt order, `AssignmentPicker` on tap, running Totals in the `StickySummaryBar`. The busiest screen in the app.
+**8 · Assignment** — `LineItemRow` list in Receipt order, `AssignmentPicker` on tap, running Totals in the `StickySummaryBar`. At ≥1024px the right-hand column also carries `AssignmentDinerTotals`, a live per-Diner running Total pinned above the Bill Total and Continue action; below that width the row list alone fills the screen and each row splits across two lines (name/quantity, then claimed chips/amount/chevron) to stay legible at the narrower measure. The busiest screen in the app.
 
 **9 · Incomplete Split** — persistent `alert` Banner naming the unclaimed Line Items and their value, with a one-tap *split these between everyone*. **Blocks sharing** — it is not a warning that can be dismissed.
 

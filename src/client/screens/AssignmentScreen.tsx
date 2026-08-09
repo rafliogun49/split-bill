@@ -3,6 +3,7 @@ import type { Bill, DinerId, LineItemId } from '../../domain'
 import { calculateSplit, divideUnclaimedEvenly, formatMoney } from '../../domain'
 import { localeForCurrency } from '../format'
 import { copy } from '../copy'
+import { AssignmentDinerTotals } from '../components/AssignmentDinerTotals'
 import { AssignmentLineItemRow } from '../components/AssignmentLineItemRow'
 import { AssignmentPicker } from '../components/AssignmentPicker'
 import { Banner } from '../components/Banner'
@@ -19,10 +20,14 @@ export interface AssignmentScreenProps {
 // DESIGN.md screen 8: a LineItemRow list in Receipt order (Bill.lineItems'
 // own order — the same order the Payer typed them in on screen 5, which
 // follows the paper receipt), AssignmentPicker on tap, running Totals in the
-// StickySummaryBar. Screen 9's Incomplete Split banner lives on this screen
-// too: undismissable, and it blocks the onward action rather than merely
-// warning (ADR — sharing a Split quietly missing money is the one mistake
-// this app exists to prevent).
+// StickySummaryBar. At >= 1024px the right-hand column also carries
+// AssignmentDinerTotals — a live per-Diner running Total pinned above the
+// Bill total and Continue action, filling the column that's otherwise empty
+// on desktop; mobile keeps only the StickySummaryBar there since the fixed
+// bottom bar already carries the same two numbers. Screen 9's Incomplete
+// Split banner lives on this screen too: undismissable, and it blocks the
+// onward action rather than merely warning (ADR — sharing a Split quietly
+// missing money is the one mistake this app exists to prevent).
 export function AssignmentScreen({ bill, onBillChange, onContinue }: AssignmentScreenProps) {
   const [openLineItemId, setOpenLineItemId] = useState<LineItemId | null>(null)
 
@@ -98,7 +103,15 @@ export function AssignmentScreen({ bill, onBillChange, onContinue }: AssignmentS
         )}
       </div>
 
-      <div className="lg:grow-[5] lg:basis-0">
+      {/* lg:top-12 matches TopBar's own min-h-12 (App.tsx) so this column's sticky
+          offset sits flush under it rather than overlapping or gapping — if
+          TopBar's height token ever changes, this one needs to move with it. */}
+      <div className="flex flex-col gap-4 lg:sticky lg:top-12 lg:grow-[5] lg:basis-0">
+        {bill.diners.length > 0 && (
+          <div className="hidden lg:block">
+            <AssignmentDinerTotals diners={bill.diners} split={split} currency={bill.currency} />
+          </div>
+        )}
         <StickySummaryBar
           label={copy.billEditor.total}
           amount={split.total}

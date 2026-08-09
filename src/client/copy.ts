@@ -137,6 +137,7 @@ export const copy = {
   },
   assignment: {
     lineItemsEmpty: 'No Line Items to assign.',
+    dinersHeading: 'Diners',
     assignRow: 'Assign',
     unclaimedHint: 'Unclaimed',
     pickerDone: 'Done',
