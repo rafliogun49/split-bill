@@ -20,6 +20,7 @@ function createEnv(overrides: Partial<Env> = {}): Env {
     OPENROUTER_MODEL_DEFAULT: 'google/gemini-3.1-flash-lite',
     OPENROUTER_MODEL_ESCALATION: 'google/gemini-3.5-flash',
     TURNSTILE_SECRET_KEY: 'test-turnstile-secret',
+    TURNSTILE_SITE_KEY: 'test-turnstile-site-key',
     PARSE_RATE_LIMITER: { limit: vi.fn(async () => ({ success: true })) },
     ...overrides,
   }

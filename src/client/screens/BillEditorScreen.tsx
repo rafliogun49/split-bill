@@ -2,12 +2,14 @@ import { useId, useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
 import type { Adjustment, Bill, LineItem } from '../../domain'
 import { calculateSplit, formatMoney } from '../../domain'
+import type { ParseReconciliation } from '../ai/parseReceiptClient'
 import { moveItem } from '../arrayMove'
 import { copy } from '../copy'
 import { SUPPORTED_CURRENCIES } from '../currencies'
 import { localeForCurrency } from '../format'
 import { PlusIcon } from '../icons'
 import { AdjustmentRow } from '../components/AdjustmentRow'
+import { Banner } from '../components/Banner'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { focusRing } from '../components/focusRing'
@@ -19,6 +21,8 @@ export interface BillEditorScreenProps {
   bill: Bill
   onBillChange: (next: Bill) => void
   onContinue: () => void
+  /** The Worker's self-check from a receipt parse, if this Bill was pre-filled from one (DESIGN.md screen 6). Absent for manual entry. */
+  reconciliation?: ParseReconciliation
 }
 
 function newLineItem(): LineItem {
@@ -34,13 +38,14 @@ function newAdjustment(): Adjustment {
 // StickySummaryBar carrying the Bill total onward to Diners. All arithmetic
 // here goes through calculateSplit (the domain layer); nothing here
 // reimplements the Subtotal or Adjustment-resolution rules.
-export function BillEditorScreen({ bill, onBillChange, onContinue }: BillEditorScreenProps) {
+export function BillEditorScreen({ bill, onBillChange, onContinue, reconciliation }: BillEditorScreenProps) {
   const dateInputId = useId()
   const currencyInputId = useId()
   const [placeDateRevealed, setPlaceDateRevealed] = useState(Boolean(bill.place || bill.date))
   const [dragIndex, setDragIndex] = useState<number | null>(null)
 
   const split = calculateSplit(bill)
+  const locale = localeForCurrency(bill.currency.code)
   const showPlaceDate = placeDateRevealed || Boolean(bill.place || bill.date)
   // Every amount is an integer in the Bill's own minor unit (CONTEXT.md
   // invariants) — switching currency once amounts exist would silently
@@ -80,6 +85,38 @@ export function BillEditorScreen({ bill, onBillChange, onContinue }: BillEditorS
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 pb-28 lg:flex-row lg:items-start lg:gap-6 lg:p-6 lg:pb-6">
       <div className="flex flex-1 flex-col gap-6">
+        {reconciliation?.status === 'match' && (
+          <Banner variant="neutral">
+            <p className="text-body-md">{copy.billEditor.reconciliationMatch}</p>
+          </Banner>
+        )}
+
+        {reconciliation?.status === 'mismatch' && (
+          <Banner variant="alert">
+            <p className="text-label-bold uppercase">{copy.billEditor.reconciliationMismatchHeading}</p>
+            <dl className="mt-2 flex flex-col gap-1">
+              <div className="flex items-baseline justify-between gap-4">
+                <dt className="text-body-md">{copy.billEditor.reconciliationComputed}</dt>
+                <dd className="text-amount-sm text-on-surface">
+                  {formatMoney(reconciliation.computedTotal, bill.currency, locale)}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4">
+                <dt className="text-body-md">{copy.billEditor.reconciliationPrinted}</dt>
+                <dd className="text-amount-sm text-on-surface">
+                  {formatMoney(reconciliation.printedTotal, bill.currency, locale)}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4">
+                <dt className="text-body-md">{copy.billEditor.reconciliationDifference}</dt>
+                <dd className="text-amount-sm text-on-surface">
+                  {formatMoney(reconciliation.difference, bill.currency, locale)}
+                </dd>
+              </div>
+            </dl>
+          </Banner>
+        )}
+
         <div className="flex flex-col gap-4">
           {showPlaceDate ? (
             <div className="flex flex-wrap items-end gap-3">
