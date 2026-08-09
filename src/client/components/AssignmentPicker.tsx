@@ -111,7 +111,13 @@ export function AssignmentPicker({ lineItem, currency, diners, dinerAmounts, onS
                 <DinerChip name={diner.name} joinIndex={diner.joinIndex} claimed={(lineItem.shares[diner.id] ?? 0) > 0} />
                 <span className="text-body-md text-on-surface">{diner.name}</span>
               </div>
-              <Stepper label={diner.name} value={lineItem.shares[diner.id] ?? 0} onChange={(next) => setShare(diner.id, next)} />
+              <Stepper
+                label={diner.name}
+                value={lineItem.shares[diner.id] ?? 0}
+                onChange={(next) => setShare(diner.id, next)}
+                increaseLabel={copy.assignment.stepperIncrease}
+                decreaseLabel={copy.assignment.stepperDecrease}
+              />
             </div>
           ))}
         </div>
