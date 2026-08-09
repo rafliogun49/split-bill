@@ -1,14 +1,51 @@
-// Nothing user-facing ships in this issue — this proves the Worker, the SPA
-// build and the token pipeline resolve end to end. Screens land in later issues.
-export function App() {
+import { useState } from 'react'
+import type { Bill } from '../domain'
+import { Card } from './components/Card'
+import { TopBar } from './components/TopBar'
+import { copy } from './copy'
+import { clearBill, loadBill } from './persistence/billStorage'
+import { StartScreen } from './screens/StartScreen'
+
+type Screen = 'start' | 'in-progress'
+
+// The remaining screens (Capture, Bill editor, Diner setup, Assignment,
+// Summary) land in later issues — this is a holding screen so the Start ->
+// Resume loop is demonstrable end to end before they exist.
+function InProgressPlaceholder() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-6">
-      <div className="border border-pure-black bg-surface-container-lowest p-6 shadow-lg">
-        <h1 className="text-headline-sm text-on-surface">SPLIT BILL</h1>
-        <p className="mt-2 text-body-md text-on-surface-variant">
-          Foundation scaffold — screens land in later issues.
-        </p>
-      </div>
-    </main>
+    <div className="flex flex-1 items-center justify-center p-6">
+      <Card>
+        <p className="text-body-md text-on-surface">{copy.inProgressPlaceholder}</p>
+      </Card>
+    </div>
+  )
+}
+
+export function App() {
+  const [bill, setBill] = useState<Bill | null>(() => loadBill())
+  const [screen, setScreen] = useState<Screen>('start')
+
+  function handleNewBill() {
+    clearBill()
+    setBill(null)
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <TopBar onExit={screen === 'in-progress' ? () => setScreen('start') : undefined} />
+      <main className="flex flex-1 flex-col">
+        {screen === 'start' ? (
+          <StartScreen
+            hasActiveBill={bill !== null}
+            onPhotograph={() => setScreen('in-progress')}
+            onEnterManually={() => setScreen('in-progress')}
+            onResume={() => setScreen('in-progress')}
+            onNewBill={handleNewBill}
+          />
+        ) : (
+          <InProgressPlaceholder />
+        )}
+      </main>
+    </div>
   )
 }

@@ -1,8 +1,15 @@
 import '@testing-library/jest-dom/vitest'
+import { cleanup } from '@testing-library/react'
 import { configureAxe, toHaveNoViolations } from 'jest-axe'
-import { expect } from 'vitest'
+import { afterEach, expect } from 'vitest'
 
 expect.extend(toHaveNoViolations)
+
+// vitest.config.ts doesn't set test.globals, so Testing Library's own
+// auto-cleanup (which only fires when it finds a global afterEach) never
+// runs — without this, every render in a file after the first accumulates
+// in the same jsdom document instead of unmounting.
+afterEach(() => cleanup())
 
 // AAA, not axe-core's AA default (DESIGN.md rule 2: every pairing clears 7:1).
 // color-contrast is disabled here because jsdom doesn't paint — it can't read

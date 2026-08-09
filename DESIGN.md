@@ -177,7 +177,9 @@ rest                 hover (pointer only)      press / active
 ≥ 1024px   two column where the screen has a summary, max 1280px centred
 ```
 
-The app is a **chromeless linear flow**. One top bar; no footer, no bottom navigation, no marketing page. There is nowhere to navigate to — the flow is strictly linear, and the bottom edge belongs to the screen's own action bar.
+Once a Bill exists, the app is a **chromeless linear flow**: one top bar, no bottom navigation, no in-flow marketing. There is nowhere to navigate to — the flow is strictly linear, and the bottom edge belongs to the screen's own action bar.
+
+**Exception: Start's first-visit state** (§9, screen 1). Before any Bill exists, Start is a short landing page — hero, How it works, a few Features, a one-line footer — making the case for the app to someone arriving cold. It still obeys every rule in §1 and §2 (no white text, AAA contrast, `primary-container` reserved for the button fill, zero radius) and every deleted token in §2 stays deleted; it does not grow a nav bar or links to pages the app doesn't have. The instant a Bill exists — including the moment New Bill or Resume is chosen — Start drops the landing content for the minimal Resume/New Bill choice, and every screen after it is the chromeless layout above.
 
 ```
 ┌────────────────────────┐        ┌──────────────────────────────────┐
@@ -282,7 +284,7 @@ Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─�
                                         Summary ─→ Share image
 ```
 
-**1 · Start** — two entry points, photograph dominant. A resume variant appears when an active Bill exists, offering *Resume* over *New Bill*, and *New Bill* warns that it discards the current one. Carries the "your photo is never stored" line. *Stitch built this as a marketing landing; it needs rebuilding to this shape.*
+**1 · Start** — first visit is a short landing page: hero (wordmark, tagline, the two entry points with photograph dominant as a large icon-led button, and the "your photo is never stored" line), a three-step How it works, a handful of Features, and a one-line footer repeating the no-accounts promise. No nav bar, no external links — there's nothing else in the app to link to. Once a Bill exists, Start drops the landing content for the minimal choice it always was: *Resume* over *New Bill*, and *New Bill* warns that it discards the current one before acting on it.
 
 **2 · Capture** — mobile opens the camera directly with a library fallback. Desktop cannot assume a camera, so a drag-and-drop file zone is primary and webcam secondary. *Enter manually instead* stays reachable.
 
@@ -321,7 +323,7 @@ Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─�
 
 **The picker costs gestures.** Assigning a Line Item is open → set → close, so a 12-item Bill is roughly 36 gestures against 15 for always-visible chips. This was chosen deliberately for density and for rows that stay readable at six Diners. If it feels slow in use, the fix is chips on a second line inside each row, not a faster picker.
 
-**Six screens have no rendered evidence.** Screens 6, 7, 9, 11 and the reworked 1, plus the Adjustments half of 5, are specified from the product spec and this token system alone. Worth running through Stitch and revising.
+**Six screens have no rendered evidence.** Screens 6, 7, 9, 11, plus the Adjustments half of 5, are specified from the product spec and this token system alone. Worth running through Stitch and revising. Screen 1 is now implemented directly in code (`StartScreen.tsx`) rather than from a Stitch export.
 
 ---
 
@@ -336,7 +338,7 @@ Stitch reliably reintroduces these. Check every one before merging an export.
 - [ ] `darkMode: "class"` and no-op `dark:` utilities
 - [ ] `outline`, `primary`, `error`, `on-*` or `mint-green` referenced
 - [ ] `primary-container` used as a Diner colour
-- [ ] Nav offering History, Groups, Pricing or API; a footer
+- [ ] Nav offering History, Groups, Pricing or API; a footer with links to pages the app doesn't have (Privacy, Terms, social) — Start's own one-line footer is the only exception
 - [ ] `cdn.tailwindcss.com`; duplicate Google Fonts `<link>`s
 - [ ] `lh3.googleusercontent.com` placeholder images
 - [ ] "Settle Up", "Split Sheet", "The Party", "Participant", "Total Owed"
