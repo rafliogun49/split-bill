@@ -5,7 +5,8 @@ import type { Currency } from './types.ts'
 // that table ourselves.
 const minorUnitDigitsCache = new Map<string, number>()
 
-function minorUnitDigits(currencyCode: string): number {
+/** Number of minor-unit decimal places a currency carries, e.g. 2 for SGD, 0 for JPY. */
+export function minorUnitDigits(currencyCode: string): number {
   let digits = minorUnitDigitsCache.get(currencyCode)
   if (digits === undefined) {
     digits =

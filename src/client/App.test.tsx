@@ -59,4 +59,40 @@ describe('App', () => {
 
     expect(getByRole('button', { name: 'Resume' })).toBeInTheDocument()
   })
+
+  it('opens the Bill editor on an empty Bill when entering manually', () => {
+    const { getByRole } = render(<App />)
+    fireEvent.click(getByRole('button', { name: 'Enter manually' }))
+    expect(getByRole('button', { name: /add line item/i })).toBeInTheDocument()
+  })
+
+  it('resumes directly into the Bill editor with the persisted Line Items', () => {
+    localStorage.setItem(
+      'split-bill:bill',
+      JSON.stringify({
+        version: 1,
+        bill: { ...bill, lineItems: [{ id: 'a', label: 'Nasi Goreng', amount: 90000, quantity: 1, shares: {} }] },
+      }),
+    )
+    const { getByRole, getByDisplayValue } = render(<App />)
+    fireEvent.click(getByRole('button', { name: 'Resume' }))
+    expect(getByDisplayValue('Nasi Goreng')).toBeInTheDocument()
+  })
+
+  it('a Bill typed by hand survives a reload, with the same total', () => {
+    const { getByRole, getByLabelText, unmount } = render(<App />)
+    fireEvent.click(getByRole('button', { name: 'Enter manually' }))
+    fireEvent.click(getByRole('button', { name: /add line item/i }))
+    fireEvent.change(getByLabelText('Line item name'), { target: { value: 'Nasi Goreng' } })
+    const lineTotal = getByLabelText(/line total/i)
+    fireEvent.focus(lineTotal)
+    fireEvent.change(lineTotal, { target: { value: '90000' } })
+    fireEvent.blur(lineTotal)
+    unmount()
+
+    const reloaded = render(<App />)
+    fireEvent.click(reloaded.getByRole('button', { name: 'Resume' }))
+    expect(reloaded.getByDisplayValue('Nasi Goreng')).toBeInTheDocument()
+    expect(reloaded.getAllByText('Rp 90.000').length).toBeGreaterThan(0)
+  })
 })

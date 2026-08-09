@@ -29,3 +29,36 @@ export function CheckIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function TrashIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M9 2h6l1 2h4v2H4V4h4l1-2Zm-3 6h12l-1 14H7L6 8Zm3 2v10h1V10H9Zm3 0v10h1V10h-1Zm3 0v10h1V10h-1Z" />
+    </svg>
+  )
+}
+
+export function PlusIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4Z" />
+    </svg>
+  )
+}
+
+export function GripIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M8 5h2v2H8V5Zm6 0h2v2h-2V5ZM8 11h2v2H8v-2Zm6 0h2v2h-2v-2ZM8 17h2v2H8v-2Zm6 0h2v2h-2v-2Z" />
+    </svg>
+  )
+}
+
+// Points down at rest; rotate with a className for other directions.
+export function ChevronIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M6.7 9.3 12 14.6l5.3-5.3 1.4 1.4-6.7 6.7-6.7-6.7 1.4-1.4Z" />
+    </svg>
+  )
+}

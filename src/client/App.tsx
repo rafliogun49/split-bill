@@ -3,14 +3,15 @@ import type { Bill } from '../domain'
 import { Card } from './components/Card'
 import { TopBar } from './components/TopBar'
 import { copy } from './copy'
-import { clearBill, loadBill } from './persistence/billStorage'
+import { clearBill, loadBill, saveBill } from './persistence/billStorage'
+import { BillEditorScreen } from './screens/BillEditorScreen'
 import { StartScreen } from './screens/StartScreen'
 
-type Screen = 'start' | 'in-progress'
+type Screen = 'start' | 'editor' | 'in-progress'
 
-// The remaining screens (Capture, Bill editor, Diner setup, Assignment,
-// Summary) land in later issues — this is a holding screen so the Start ->
-// Resume loop is demonstrable end to end before they exist.
+// The remaining screens (Capture, Diner setup, Assignment, Summary) land in
+// later issues — this is a holding screen so the Photograph path is
+// demonstrable end to end before Capture and parsing exist.
 function InProgressPlaceholder() {
   return (
     <div className="flex flex-1 items-center justify-center p-6">
@@ -19,6 +20,12 @@ function InProgressPlaceholder() {
       </Card>
     </div>
   )
+}
+
+// Manual entry always starts in the Bill currency worked throughout
+// DESIGN.md; the editor's own currency selector corrects it from there.
+function emptyBill(): Bill {
+  return { currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [] }
 }
 
 export function App() {
@@ -30,18 +37,32 @@ export function App() {
     setBill(null)
   }
 
+  function handleEnterManually() {
+    const next = bill ?? emptyBill()
+    setBill(next)
+    saveBill(next)
+    setScreen('editor')
+  }
+
+  function handleBillChange(next: Bill) {
+    setBill(next)
+    saveBill(next)
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <TopBar onExit={screen === 'in-progress' ? () => setScreen('start') : undefined} />
+      <TopBar onExit={screen !== 'start' ? () => setScreen('start') : undefined} />
       <main className="flex flex-1 flex-col">
         {screen === 'start' ? (
           <StartScreen
             hasActiveBill={bill !== null}
             onPhotograph={() => setScreen('in-progress')}
-            onEnterManually={() => setScreen('in-progress')}
-            onResume={() => setScreen('in-progress')}
+            onEnterManually={handleEnterManually}
+            onResume={() => setScreen('editor')}
             onNewBill={handleNewBill}
           />
+        ) : screen === 'editor' && bill ? (
+          <BillEditorScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('in-progress')} />
         ) : (
           <InProgressPlaceholder />
         )}
