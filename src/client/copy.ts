@@ -97,6 +97,8 @@ export const copy = {
     lineItemName: 'Line item name',
     lineItemFallbackName: 'line item',
     quantity: 'Quantity',
+    increaseQuantity: 'Increase quantity —',
+    decreaseQuantity: 'Decrease quantity —',
     unitPrice: 'Unit price',
     lineTotal: 'Line total',
     addLineItem: 'Add Line Item',
