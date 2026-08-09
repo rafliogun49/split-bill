@@ -41,6 +41,21 @@ src/design/            Design tokens — single source of truth for tailwind.con
                        tests (contrast, deleted tokens, no dark mode).
 ```
 
-`screens/`, `components/`, `persistence/`, `ai/` and `src/domain/` don't exist yet — they land with the issues noted above rather than as empty placeholder folders.
+`screens/`, `components/` and `persistence/` don't exist yet — they land with the issues noted above rather than as empty placeholder folders.
 
 Tailwind's theme carries Material 3 token names at pastel values (ADR-0007) — tokens DESIGN.md doesn't define are absent from the theme rather than overridden, so referencing one fails visibly. `src/design/tokens.ts` is the single source; `tailwind.config.ts` builds the theme from it.
+
+## Configuration
+
+`POST /api/parse` (issue #10) needs these bindings. Non-secret model identifiers live in `wrangler.jsonc` under `vars`; everything else is a secret and must never be committed.
+
+| Name | Kind | Where |
+|---|---|---|
+| `OPENROUTER_API_KEY` | secret | `.dev.vars` locally, `wrangler secret put OPENROUTER_API_KEY` in prod |
+| `TURNSTILE_SECRET_KEY` | secret | `.dev.vars` locally, `wrangler secret put TURNSTILE_SECRET_KEY` in prod |
+| `TURNSTILE_SITE_KEY` | non-secret, client-facing | `.dev.vars` locally (lands in `wrangler.jsonc` `vars` when the client widget ships in issue #11) |
+| `OPENROUTER_MODEL_DEFAULT` | var | `wrangler.jsonc` — `google/gemini-3.1-flash-lite` |
+| `OPENROUTER_MODEL_ESCALATION` | var | `wrangler.jsonc` — `google/gemini-3.5-flash` |
+| `PARSE_RATE_LIMITER` | ratelimit binding | `wrangler.jsonc` — 10 requests / 60s per key (caller IP) |
+
+**Spend cap.** The Workers rate limiter and the request-size/content-type checks in `src/server/upload.ts` bound *volume*, but the actual dollar ceiling is a hard spend cap configured on the OpenRouter account itself (dashboard → Settings → spend limit), not in code — so the worst case if abused is a stopped endpoint, not an unbounded invoice. Set this before deploying; nothing in this repo can do it for you.
