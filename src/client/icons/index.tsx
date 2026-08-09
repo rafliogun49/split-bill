@@ -54,6 +54,24 @@ export function PlusIcon({ className }: IconProps) {
   )
 }
 
+export function MinusIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M4 11h16v2H4v-2Z" />
+    </svg>
+  )
+}
+
+// The "unclaimed" affordance a LineItemRow shows in place of DinerChips
+// (DESIGN.md §8 icon set: `person+`).
+export function PersonPlusIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-8 1.7-8 5v2h14v-2c0-3.3-4.7-5-6-5Zm9-4h-2v3h-3v2h3v3h2v-3h3v-2h-3V9Z" />
+    </svg>
+  )
+}
+
 export function GripIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">

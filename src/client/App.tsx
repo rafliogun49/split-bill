@@ -4,15 +4,16 @@ import { Card } from './components/Card'
 import { TopBar } from './components/TopBar'
 import { copy } from './copy'
 import { clearBill, loadBill, saveBill } from './persistence/billStorage'
+import { AssignmentScreen } from './screens/AssignmentScreen'
 import { BillEditorScreen } from './screens/BillEditorScreen'
 import { DinerSetupScreen } from './screens/DinerSetupScreen'
 import { StartScreen } from './screens/StartScreen'
 
-type Screen = 'start' | 'editor' | 'diner-setup' | 'in-progress'
+type Screen = 'start' | 'editor' | 'diner-setup' | 'assignment' | 'in-progress'
 
-// The remaining screens (Capture, Assignment, Summary) land in later issues
-// — this is a holding screen so the Photograph and Diner-setup paths are
-// demonstrable end to end before Assignment and parsing exist.
+// The remaining screens (Capture, Summary) land in later issues — this is a
+// holding screen so the Photograph path and post-Assignment flow are
+// demonstrable end to end before Summary and parsing exist.
 function InProgressPlaceholder() {
   return (
     <div className="flex flex-1 items-center justify-center p-6">
@@ -65,7 +66,9 @@ export function App() {
         ) : screen === 'editor' && bill ? (
           <BillEditorScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('diner-setup')} />
         ) : screen === 'diner-setup' && bill ? (
-          <DinerSetupScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('in-progress')} />
+          <DinerSetupScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('assignment')} />
+        ) : screen === 'assignment' && bill ? (
+          <AssignmentScreen bill={bill} onBillChange={handleBillChange} onContinue={() => setScreen('in-progress')} />
         ) : (
           <InProgressPlaceholder />
         )}
