@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import app from './index'
 
-describe('worker', () => {
+describe('server', () => {
   it('responds to the stub health route', async () => {
     const res = await app.request('/api/health')
 

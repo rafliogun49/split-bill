@@ -13,9 +13,9 @@ function walk(dir: string): string[] {
 }
 
 describe('dark mode', () => {
-  it('no dark: utility appears anywhere in the app source', () => {
-    const appDir = join(__dirname, '..', 'app')
-    const files = walk(appDir).filter((file) => /\.(tsx?|css)$/.test(file))
+  it('no dark: utility appears anywhere in the client source', () => {
+    const clientDir = join(__dirname, '..', 'client')
+    const files = walk(clientDir).filter((file) => /\.(tsx?|css)$/.test(file))
 
     expect(files.length).toBeGreaterThan(0)
 
