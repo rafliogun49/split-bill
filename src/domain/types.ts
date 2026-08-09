@@ -13,6 +13,13 @@ export interface Currency {
 export interface Diner {
   id: DinerId
   name: string
+  /**
+   * The order this Diner joined the Bill, assigned once and never reused —
+   * a later removal must not shift a remaining Diner's position. Drives the
+   * `diner-N` colour scale in the client layer (DESIGN.md "Diner scale");
+   * the colour itself is a rendering concern and stays out of this file.
+   */
+  joinIndex: number
 }
 
 export interface LineItem {
@@ -45,6 +52,8 @@ export interface Bill {
   place?: string
   date?: string
   diners: Diner[]
+  /** The Diner who paid, if marked. May reference a Diner no longer in `diners`; treat as unset in that case. */
+  payerId?: DinerId
   lineItems: LineItem[]
   /** Order is load-bearing — see ADR-0005. */
   adjustments: Adjustment[]

@@ -39,3 +39,9 @@ export function rememberDinerName(name: string): void {
   const stored: StoredNames = { version: VERSION, names }
   safeSetItem(STORAGE_KEY, JSON.stringify(stored))
 }
+
+export function forgetDinerName(name: string): void {
+  const names = loadRememberedDinerNames().filter((remembered) => remembered !== name)
+  const stored: StoredNames = { version: VERSION, names }
+  safeSetItem(STORAGE_KEY, JSON.stringify(stored))
+}

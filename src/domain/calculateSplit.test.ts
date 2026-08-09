@@ -5,7 +5,7 @@ import type { Adjustment, Bill, Diner, LineItem } from './types.ts'
 const sgd = { code: 'SGD' }
 
 function diner(id: string, name = id): Diner {
-  return { id, name }
+  return { id, name, joinIndex: 0 }
 }
 
 function lineItem(id: string, amount: number, shares: Record<string, number> = {}): LineItem {

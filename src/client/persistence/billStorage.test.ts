@@ -5,7 +5,7 @@ import { clearBill, loadBill, saveBill } from './billStorage'
 const bill: Bill = {
   currency: { code: 'IDR' },
   place: 'Warung Tekko',
-  diners: [{ id: 'd1', name: 'Rafli' }],
+  diners: [{ id: 'd1', name: 'Rafli', joinIndex: 0 }],
   lineItems: [{ id: 'li1', label: 'Nasi Goreng', amount: 90_000, quantity: 1, shares: { d1: 1 } }],
   adjustments: [],
 }
