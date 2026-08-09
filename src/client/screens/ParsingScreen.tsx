@@ -79,8 +79,8 @@ export function ParsingScreen({ file, onParsed, onFailure, onCancel }: ParsingSc
 
   return (
     <div className="flex flex-1 items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <h1 className="mb-4 text-headline-md uppercase text-on-surface">{copy.parsing.heading}</h1>
+      <div className="w-full max-w-lg">
+        <h1 className="mb-6 text-center text-headline-lg uppercase text-on-surface">{copy.parsing.heading}</h1>
         <ProgressCard progress={null} steps={steps} cancelLabel={copy.parsing.cancel} onCancel={handleCancel} />
       </div>
     </div>
