@@ -10,5 +10,19 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "vars": {
+    // Non-secret model config for the parse route (issue #10). The
+    // OpenRouter key and Turnstile secret are true secrets and live in
+    // .dev.vars locally / `wrangler secret put` in prod, never here.
+    "OPENROUTER_MODEL_DEFAULT": "google/gemini-3.1-flash-lite",
+    "OPENROUTER_MODEL_ESCALATION": "google/gemini-3.5-flash"
+  },
+  "ratelimits": [
+    {
+      "name": "PARSE_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ]
 }
