@@ -1,6 +1,6 @@
 # Split Bill — Design
 
-The reference an agent reads **before** writing any UI. It is normative: where this file and a Stitch export disagree, this file wins.
+The reference an agent reads **before** writing any UI. It is normative: where this file and a Stitch export disagree on tokens, copy, or the four rules in §1, this file wins. For a screen with Stitch evidence, the export's markup and layout are the starting point — adapt it through the §11 checklist, don't redesign it from this file's prose.
 
 Companion documents:
 
@@ -8,7 +8,7 @@ Companion documents:
 |---|---|
 | `CONTEXT.md` | Domain vocabulary. All UI copy obeys it. |
 | `docs/adr/0007-…` | Why the tokens carry Material 3 names |
-| `docs/design/stitch-design.md` | Raw Stitch exports — evidence, not truth |
+| `docs/design/stitch-design.md` | Raw Stitch exports — the layout to adapt for screens listed in §9; run every export through §11's checklist, never redesign from scratch |
 | `docs/design/stitch-prompts.md` | Prompts used to generate them |
 | [issue #1](https://github.com/rafliogun49/split-bill/issues/1) | The product spec — 59 stories |
 
@@ -224,7 +224,7 @@ Adjustments are **never assignable**. They are allocated pro-rata by Subtotal, a
 
 ## 8. Components
 
-Fourteen. No component library — these are hand-built against the tokens above.
+Fifteen. No component library — these are hand-built against the tokens above.
 
 **`Button`** — `primary` (`primary-container` fill), `secondary` (white fill), `danger` (`error-container` fill), `disabled`. All four carry black text and `shadow-md`. Minimum height 48px.
 
@@ -232,7 +232,9 @@ Fourteen. No component library — these are hand-built against the tokens above
 
 **`TopBar`** — sticky, white, bottom border only, wordmark left, exit/restart right. No navigation.
 
-**`LineItemRow`** — name, quantity, line total, claimed `DinerChip`s, chevron. ~72px tall. Tapping anywhere opens `AssignmentPicker`. Unclaimed rows show a `+person` icon in place of chips.
+**`LineItemRow`** — the Bill editor's row (screen 5): inline-editable name, quantity, unit price and line total, plus reorder and remove controls. Entering quantity or unit price fills the line total; the line total is overridable and authoritative.
+
+**`AssignmentLineItemRow`** — the Assignment screen's row (screen 8): read-only name, quantity, line total, claimed `DinerChip`s, chevron. ~72px tall. Tapping anywhere opens `AssignmentPicker`. Unclaimed rows show a `+person` icon in place of chips. A distinct component from `LineItemRow` rather than a shared one, since one edits the Line Item and the other only opens the picker onto it.
 
 **`DinerChip`** — 44×44 square, `diner-N` fill, black border, initial in `label-bold`. Claimed carries `shadow-sm`; unclaimed carries none. A Share count above 1 renders as a superscript badge in the top-right corner. Claimed/unclaimed must never depend on fill alone.
 
@@ -270,6 +272,8 @@ person+ chevron warning share  copy   trash grip
 ## 9. Screens
 
 Flow order. Screens 1–5, 8 and 10 have Stitch evidence; the rest are specified here first.
+
+For a screen with Stitch evidence, start from its export in `docs/design/stitch-design.md` — same structure, same component boundaries — and fix it up via the §11 checklist. Only screens without evidence are designed from the prose below.
 
 ```
 Start ─┬─ photograph ─→ Capture ─→ Parsing ─┬─ Failure ─┐

@@ -100,4 +100,18 @@ export const copy = {
     unmarkAsPayer: 'Remove as Payer',
     continueToAssignment: 'Assignment',
   },
+  assignment: {
+    lineItemsEmpty: 'No Line Items to assign.',
+    assignRow: 'Assign',
+    unclaimedHint: 'Unclaimed',
+    pickerDone: 'Done',
+    pickerNoClaims: 'No one has claimed this yet.',
+    stepperDecrease: 'Decrease Shares —',
+    stepperIncrease: 'Increase Shares —',
+    adjustmentsUnassignableNote: "Adjustments are split automatically and can't be assigned to a Diner.",
+    incompleteSplitHeading: 'Incomplete Split',
+    incompleteSplitTrailer: 'unclaimed',
+    divideRemainder: 'Split the rest between everyone',
+    continueToSummary: 'Summary',
+  },
 } as const
