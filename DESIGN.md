@@ -13,21 +13,21 @@ Vibrant, cheerful pastel neobrutalism. Reference build: `C:\split-bill\docs\desi
 ## Colour palette
 | Role | Hex | Contrast vs black | Tier |
 |---|---|---|---|
-| Page background | `#FFF7ED` | 19.8:1 | AAA |
-| Card fill | `#FFFFFF` | 21.0:1 | AAA |
-| Inert/track fill | `#E9E3F4` | 16.8:1 | n/a (no text) |
-| Secondary label text | `#4A4458` | 9.3:1 vs white | AAA |
+| Page background (dot-textured, every screen) | `#EDE6DC` | 17.0:1 | AAA |
+| Card fill | `#FFF7ED` | 19.8:1 | AAA |
+| Ink (body text, headings) | `#1A1720` | 14.3–16.7:1 vs. the two grounds above | AAA |
+| Secondary label text | `#4A4458` | 7.5:1 on page bg, 8.8:1 on card | AAA |
 | Primary button accent | `#FF936A` (tangerine) | 9.6:1 | AAA |
 | Destructive/alert fill | `#FF7E8E` (coral-red) | 8.6:1 | AAA |
-| Disabled fill | `#E7E7E7` | 17.0:1 | n/a |
-| Diner 1 — marigold | `#E6BE68` | 11.9:1 | AAA |
-| Diner 2 — lime | `#A4D589` | 12.5:1 | AAA |
-| Diner 3 — teal | `#61DCC7` | 12.6:1 | AAA |
-| Diner 4 — sky | `#66D4FC` | 12.4:1 | AAA |
-| Diner 5 — periwinkle | `#B5BCFF` | 11.6:1 | AAA |
-| Diner 6 — orchid | `#EFA9E8` | 11.5:1 | AAA |
+| Disabled fill (also the inert/track fill — no distinct value exists in the mockup) | `#E7E7E7` | 17.0:1 | AAA |
+| Diner 1 — blue | `#66D4FC` | 12.4:1 | AAA |
+| Diner 2 — green | `#A4D589` | 12.5:1 | AAA |
+| Diner 3 — pink | `#EFA9E8` | 11.5:1 | AAA |
+| Diner 4 — gold | `#E6BE68` | 11.9:1 | AAA |
+| Diner 5 — teal | `#61DCC7` | 12.6:1 | AAA |
+| Diner 6 — periwinkle | `#B5BCFF` | 11.6:1 | AAA |
 
-Six Diner hues sit ~45–50° apart on the wheel, sharing lightness/chroma so they read as a matched set while staying distinguishable from each other and from the tangerine primary. No green/success colour exists — "all clear" stays the absence of the red alert fill.
+Six Diner hues sit ~45–50° apart on the wheel, sharing lightness/chroma so they read as a matched set while staying distinguishable from each other and from the tangerine primary. No green/success colour exists as an "all clear" signal — Parsing's done-step check-badge is the one place `diner-2` green is reused for that meaning. Ink (`#1A1720`) is a warm near-black, deliberately distinct from the pure `#000000` used for borders and shadows — the two never share a token.
 
 ## Typography
 - **Archivo Black** — headings, uppercase, single weight (it has no real bold, never faked).

@@ -33,6 +33,22 @@ const typeScalePlugin = plugin(({ addUtilities, theme }) => {
   addUtilities(utilities as Parameters<typeof addUtilities>[0])
 })
 
+// DESIGN.md's colour palette / vibrant-neobrutalism-mockup.md: a 22×22px
+// repeating dot, ink-coloured at 14% opacity, applied once at the app-shell
+// level so it renders behind every screen rather than being reimplemented
+// per screen.
+const dotTexturePlugin = plugin(({ addUtilities }) => {
+  const dot = encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><circle cx='11' cy='11' r='1.5' fill='${colors['on-background']}' fill-opacity='0.14'/></svg>`,
+  )
+  addUtilities({
+    '.bg-dot-texture': {
+      backgroundImage: `url("data:image/svg+xml,${dot}")`,
+      backgroundRepeat: 'repeat',
+    },
+  })
+})
+
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   // darkMode is intentionally omitted — DESIGN.md §2 rules dark mode out of
@@ -78,5 +94,5 @@ export default {
       },
     },
   },
-  plugins: [typeScalePlugin],
+  plugins: [typeScalePlugin, dotTexturePlugin],
 } satisfies Config
