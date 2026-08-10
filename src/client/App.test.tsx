@@ -227,7 +227,7 @@ describe('App', () => {
       localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill: filledBill }))
       window.history.replaceState(null, '', '/summary')
       const { getByRole } = render(<App />)
-      expect(getByRole('button', { name: 'Share summary' })).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Copy text' })).toBeInTheDocument()
     })
 
     it('refreshing Parsing (an in-flight request that cannot survive reload) lands on Capture, never a stuck Parsing screen', () => {
