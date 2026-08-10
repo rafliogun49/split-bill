@@ -14,6 +14,16 @@ export interface AmountFieldProps {
   currency: Currency
   onChange: (minorUnits: number) => void
   id?: string
+  /**
+   * Standalone.html's own caption: "Boxed white fields are editable · plain
+   * text is calculated automatically." A Line Total is always boxed
+   * (`'always'`, the default) — it's the number a Diner audits. A Line
+   * Item's unit price is never boxed (`'never'`) — it reads as plain
+   * calculated text, baked into "2 × $6.50 =", at every breakpoint.
+   */
+  boxed?: 'always' | 'lg' | 'never'
+  /** DESIGN.md §8 specifies right-aligned amounts; the Bill editor's Line Items row reads left-to-right as a sentence ("2 × $6.50 = $13.00") and asked to align left instead. */
+  align?: 'left' | 'right'
 }
 
 function toMajorUnitString(minorUnits: number, digits: number): string {
@@ -30,7 +40,7 @@ function toMinorUnits(text: string, digits: number): number | null {
 // minor unit. Shows the locale-formatted amount at rest ("Rp 156.177"); a
 // focused field edits the plain major-unit number ("156177") so typing isn't
 // fighting a currency symbol and thousands separators, then reformats on blur.
-export function AmountField({ label, hideLabel, value, currency, onChange, id }: AmountFieldProps) {
+export function AmountField({ label, hideLabel, value, currency, onChange, id, boxed = 'always', align = 'right' }: AmountFieldProps) {
   const generatedId = useId()
   const inputId = id ?? generatedId
   const digits = minorUnitDigits(currency.code)
@@ -76,7 +86,14 @@ export function AmountField({ label, hideLabel, value, currency, onChange, id }:
         onFocus={handleFocus}
         onChange={handleChange}
         onBlur={handleBlur}
-        className={`border border-pure-black bg-surface-container-lowest px-3 py-2 text-right text-amount-md text-on-surface ${focusRing}`}
+        className={
+          (boxed === 'always'
+            ? `w-full min-w-0 border border-pure-black bg-surface-container-lowest px-3 py-2 text-amount-md text-on-surface ${focusRing}`
+            : boxed === 'lg'
+              ? `w-full min-w-0 border-0 bg-transparent p-0 text-body-md text-on-surface lg:border lg:border-pure-black lg:bg-surface-container-lowest lg:px-3 lg:py-2 lg:text-amount-sm ${focusRing}`
+              : `w-full min-w-0 border-0 bg-transparent p-0 text-body-md text-on-surface ${focusRing}`) +
+          (align === 'left' ? ' text-left' : ' text-right')
+        }
       />
     </div>
   )

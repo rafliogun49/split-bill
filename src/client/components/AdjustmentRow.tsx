@@ -83,67 +83,28 @@ export function AdjustmentRow({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className="flex flex-col gap-3 border-b border-pure-black p-4 last:border-b-0"
+      // Standalone.html screen 5: each Adjustment is its own bordered box
+      // (matching Line Items), not a shared list divided by border lines.
+      className="flex flex-col gap-3 border border-pure-black bg-surface-container-lowest p-3"
     >
+      {/* Standalone.html screen 5: grip, label, value — one clean row, the
+          same shape as the reference. The kind toggle, resolved amount and
+          reorder/delete controls the static mockup doesn't depict move to a
+          lighter second line below instead of crowding this one. */}
       <div className="flex items-center gap-2">
         <GripIcon className="h-5 w-5 shrink-0 text-on-surface-variant" />
-        <div className="flex-1">
+        <div className="lg:min-w-0 flex-1">
           <TextField
             label={copy.billEditor.adjustmentName}
             hideLabel
+            boxed="never"
             placeholder={copy.billEditor.adjustmentName}
             value={adjustment.label}
             onChange={(event) => onChange({ ...adjustment, label: event.target.value })}
           />
         </div>
-        <button
-          type="button"
-          onClick={onMoveUp}
-          disabled={!canMoveUp}
-          aria-label={`${copy.billEditor.moveUp} ${name}`}
-          className={`p-2 text-on-surface disabled:text-disabled ${focusRing}`}
-        >
-          <ChevronIcon className="h-4 w-4 rotate-180" />
-        </button>
-        <button
-          type="button"
-          onClick={onMoveDown}
-          disabled={!canMoveDown}
-          aria-label={`${copy.billEditor.moveDown} ${name}`}
-          className={`p-2 text-on-surface disabled:text-disabled ${focusRing}`}
-        >
-          <ChevronIcon className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={onRemove}
-          aria-label={`${copy.billEditor.removeAdjustment} ${name}`}
-          className={`p-2 text-on-surface ${focusRing}`}
-        >
-          <TrashIcon className="h-5 w-5" />
-        </button>
-      </div>
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="flex gap-1" role="group" aria-label={`${copy.billEditor.adjustmentKind} — ${name}`}>
-          <button
-            type="button"
-            aria-pressed={adjustment.kind === 'rate'}
-            onClick={() => switchKind('rate')}
-            className={`border border-pure-black px-3 py-2 text-label-bold uppercase text-on-surface ${adjustment.kind === 'rate' ? 'bg-primary-container' : 'bg-surface-container-lowest'} ${focusRing}`}
-          >
-            {copy.billEditor.rate}
-          </button>
-          <button
-            type="button"
-            aria-pressed={adjustment.kind === 'fixed'}
-            onClick={() => switchKind('fixed')}
-            className={`border border-pure-black px-3 py-2 text-label-bold uppercase text-on-surface ${adjustment.kind === 'fixed' ? 'bg-primary-container' : 'bg-surface-container-lowest'} ${focusRing}`}
-          >
-            {copy.billEditor.fixed}
-          </button>
-        </div>
         {adjustment.kind === 'rate' ? (
-          <div className="w-24">
+          <div className="w-20 shrink-0">
             <TextField
               label={`${copy.billEditor.ratePercent} — ${name}`}
               hideLabel
@@ -154,7 +115,7 @@ export function AdjustmentRow({
             />
           </div>
         ) : (
-          <div className="flex-1">
+          <div className="w-36 shrink-0">
             <AmountField
               label={`${copy.billEditor.fixedAmount} — ${name}`}
               hideLabel
@@ -164,12 +125,62 @@ export function AdjustmentRow({
             />
           </div>
         )}
-        <p className="text-label-sm text-on-surface-variant">
-          {copy.billEditor.resolvesTo}{' '}
-          <span className="text-amount-sm text-on-surface">
-            {formatMoney(resolvedAmount, currency, localeForCurrency(currency.code))}
-          </span>
-        </p>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1" role="group" aria-label={`${copy.billEditor.adjustmentKind} — ${name}`}>
+            <button
+              type="button"
+              aria-pressed={adjustment.kind === 'rate'}
+              onClick={() => switchKind('rate')}
+              className={`border border-pure-black px-2 py-1 text-label-sm uppercase text-on-surface ${adjustment.kind === 'rate' ? 'bg-primary-container' : 'bg-surface-container-lowest'} ${focusRing}`}
+            >
+              {copy.billEditor.rate}
+            </button>
+            <button
+              type="button"
+              aria-pressed={adjustment.kind === 'fixed'}
+              onClick={() => switchKind('fixed')}
+              className={`border border-pure-black px-2 py-1 text-label-sm uppercase text-on-surface ${adjustment.kind === 'fixed' ? 'bg-primary-container' : 'bg-surface-container-lowest'} ${focusRing}`}
+            >
+              {copy.billEditor.fixed}
+            </button>
+          </div>
+          <p className="text-label-sm text-on-surface-variant">
+            {copy.billEditor.resolvesTo}{' '}
+            <span className="text-amount-sm text-on-surface">
+              {formatMoney(resolvedAmount, currency, localeForCurrency(currency.code))}
+            </span>
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={onMoveUp}
+            disabled={!canMoveUp}
+            aria-label={`${copy.billEditor.moveUp} ${name}`}
+            className={`p-2 text-on-surface disabled:text-disabled ${focusRing}`}
+          >
+            <ChevronIcon className="h-4 w-4 rotate-180" />
+          </button>
+          <button
+            type="button"
+            onClick={onMoveDown}
+            disabled={!canMoveDown}
+            aria-label={`${copy.billEditor.moveDown} ${name}`}
+            className={`p-2 text-on-surface disabled:text-disabled ${focusRing}`}
+          >
+            <ChevronIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label={`${copy.billEditor.removeAdjustment} ${name}`}
+            className={`p-2 text-on-surface ${focusRing}`}
+          >
+            <TrashIcon className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   )

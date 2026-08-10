@@ -2,11 +2,11 @@ import type { ButtonHTMLAttributes } from 'react'
 import { focusRing } from './focusRing'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger'
-export type ButtonSize = 'default' | 'hero'
+export type ButtonSize = 'default' | 'hero' | 'full'
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   variant?: ButtonVariant
-  /** `hero` stacks icon + label for the Start screen's dominant photograph action. */
+  /** `hero` stacks icon + label for the Start screen's dominant photograph action. `full` is a standalone full-width CTA, e.g. StickySummaryBar's "Continue to Diners". */
   size?: ButtonSize
 }
 
@@ -24,6 +24,7 @@ const variantFill: Record<ButtonVariant, string> = {
 const sizeClasses: Record<ButtonSize, string> = {
   default: 'min-h-[48px] px-6',
   hero: 'flex w-full flex-col items-center gap-3 px-6 py-10',
+  full: 'flex w-full items-center justify-center min-h-[52px] px-6 py-3',
 }
 
 /**
