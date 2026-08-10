@@ -15,8 +15,14 @@ afterEach(() => {
 describe('CaptureScreen', () => {
   it('presents the camera ahead of the photo library, per DESIGN.md screen 2', () => {
     const { getByRole } = render(<CaptureScreen onCapture={vi.fn()} onEnterManually={vi.fn()} />)
-    expect(getByRole('button', { name: 'Take photo' })).toBeInTheDocument()
+    expect(getByRole('heading', { name: 'Scan receipt' })).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Scan photo' })).toBeInTheDocument()
     expect(getByRole('button', { name: /choose from library/i })).toBeInTheDocument()
+  })
+
+  it('says Scan, never Photograph', () => {
+    const { container } = render(<CaptureScreen onCapture={vi.fn()} onEnterManually={vi.fn()} />)
+    expect(container).not.toHaveTextContent(/photograph/i)
   })
 
   it('calls onCapture with the file chosen through the camera input', () => {

@@ -54,9 +54,27 @@ export default {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(400%)' },
         },
+        // Issue #23: entrance for Start's landing hero and its How-it-works /
+        // Features cards — DESIGN.md §5's other named carve-out. One-shot, no
+        // fill-mode: the keyframe's 100% frame matches each element's own
+        // resting (non-animated) styles, so when the animation ends control
+        // reverts to the ordinary cascade with no visible snap.
+        'fade-slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        // Same shape, but lands on the receipt illustration's resting tilt
+        // (`-rotate-3`) instead of no rotation, so entrance hands off to that
+        // utility class cleanly too.
+        'receipt-in': {
+          '0%': { opacity: '0', transform: 'translateY(16px) rotate(0deg)' },
+          '100%': { opacity: '1', transform: 'translateY(0) rotate(-3deg)' },
+        },
       },
       animation: {
         'progress-indeterminate': 'progress-indeterminate 1.2s ease-in-out infinite',
+        'fade-slide-up': 'fade-slide-up 500ms ease-out',
+        'receipt-in': 'receipt-in 600ms ease-out',
       },
     },
   },

@@ -49,7 +49,7 @@ describe('App', () => {
   it('opens on the Start screen with no Resume offered when nothing is persisted', () => {
     const { queryByRole, getByRole } = render(<App />)
     expect(queryByRole('button', { name: 'Resume' })).not.toBeInTheDocument()
-    expect(getByRole('button', { name: 'Photograph receipt' })).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument()
   })
 
   it('offers Resume when a Bill was persisted from a previous session', () => {
@@ -125,15 +125,16 @@ describe('App', () => {
     }
 
     function photograph(app: ReturnType<typeof render>) {
-      fireEvent.click(app.getByRole('button', { name: 'Photograph receipt' }))
+      fireEvent.click(app.getByRole('button', { name: 'Scan receipt' }))
       const input = app.container.querySelector('input[name="library-photo"]') as HTMLInputElement
       fireEvent.change(input, { target: { files: [new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })] } })
     }
 
-    it('goes to the Capture screen from Photograph, not straight to the editor', () => {
+    it('goes to the Capture screen from Scan, not straight to the editor', () => {
       const app = render(<App />)
-      fireEvent.click(app.getByRole('button', { name: 'Photograph receipt' }))
-      expect(app.getByRole('button', { name: 'Take photo' })).toBeInTheDocument()
+      fireEvent.click(app.getByRole('button', { name: 'Scan receipt' }))
+      expect(app.getByRole('heading', { name: 'Scan receipt' })).toBeInTheDocument()
+      expect(app.getByRole('button', { name: 'Scan photo' })).toBeInTheDocument()
     })
 
     it('a successful parse pre-fills the editor and shows the reconciliation banner', async () => {
@@ -169,7 +170,7 @@ describe('App', () => {
       await waitFor(() => expect(requestParse).toHaveBeenCalled())
       fireEvent.click(app.getByRole('button', { name: 'Cancel' }))
 
-      expect(app.getByRole('button', { name: 'Take photo' })).toBeInTheDocument()
+      expect(app.getByRole('button', { name: 'Scan photo' })).toBeInTheDocument()
     })
   })
 })
