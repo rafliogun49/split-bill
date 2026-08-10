@@ -1,9 +1,10 @@
+import { createRef } from 'react'
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { axe } from '../../../test/setup'
 import type { Bill } from '../../domain'
 import { calculateSplit } from '../../domain'
-import { ShareCard } from './ShareCard'
+import { ShareCard, SHARE_CARD_WIDTH } from './ShareCard'
 
 function bill(overrides: Partial<Bill> = {}): Bill {
   return { currency: { code: 'SGD' }, diners: [], lineItems: [], adjustments: [], ...overrides }
@@ -69,6 +70,16 @@ describe('ShareCard', () => {
     const withoutPlace = bill({ diners: [{ id: 'a', name: 'Alice', joinIndex: 0 }], lineItems: [] })
     rerender(<ShareCard bill={withoutPlace} split={calculateSplit(withoutPlace)} locale="en-SG" />)
     expect(queryByText('Pizza Place')).not.toBeInTheDocument()
+  })
+
+  it('forwards a ref to its own root element — the sized node a caller should capture to PNG', () => {
+    const ref = createRef<HTMLDivElement>()
+    const b = bill({ diners: [{ id: 'a', name: 'Alice', joinIndex: 0 }], lineItems: [] })
+    render(<ShareCard ref={ref} bill={b} split={calculateSplit(b)} locale="en-SG" />)
+
+    expect(ref.current).not.toBeNull()
+    expect(ref.current?.style.width).toBe(`${SHARE_CARD_WIDTH}px`)
+    expect(ref.current?.textContent).toContain('Alice')
   })
 
   it('renders no button or anchor elements', () => {

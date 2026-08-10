@@ -1,8 +1,9 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { axe } from '../../../test/setup'
 import type { Bill } from '../../domain'
 import { SummaryScreen } from './SummaryScreen'
+import { SHARE_CARD_WIDTH } from '../components/ShareCard'
 
 vi.mock('../share/captureShareImage', () => ({
   captureShareImage: vi.fn(async () => 'data:image/png;base64,stub'),
@@ -13,6 +14,14 @@ function bill(overrides: Partial<Bill> = {}): Bill {
 }
 
 const originalFetch = global.fetch
+
+beforeEach(() => {
+  global.fetch = vi.fn(async () => new Response(new Blob(['stub'], { type: 'image/png' }))) as unknown as typeof fetch
+  // jsdom doesn't implement the Blob URL registry — stub it so the
+  // anchor-download path is exercised without hitting "not implemented".
+  URL.createObjectURL = vi.fn(() => 'blob:mock-url')
+  URL.revokeObjectURL = vi.fn()
+})
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -33,9 +42,26 @@ describe('SummaryScreen', () => {
     expect(getByText('Alice is owed')).toBeInTheDocument()
   })
 
-  it('shares the plain-text summary through the Web Share API when available', async () => {
+  it('renders the ShareCard on its own root element, sized to its content, not an unsized wrapper', () => {
+    const b = bill({
+      diners: [{ id: 'a', name: 'Alice', joinIndex: 0 }],
+      lineItems: [{ id: '1', label: 'Pizza', amount: 1000, quantity: 1, shares: { a: 1 } }],
+    })
+    const { getByText } = render(<SummaryScreen bill={b} />)
+    // The ShareCard root is the element that carries its own explicit width —
+    // find it by walking up from known ShareCard content to the element that
+    // sets that width inline, and confirm nothing wider (an unsized wrapper)
+    // sits directly above it before the scroll container.
+    const cardRoot = getByText('Alice').closest('[style*="width"]') as HTMLElement
+    expect(cardRoot).not.toBeNull()
+    expect(cardRoot.style.width).toBe(`${SHARE_CARD_WIDTH}px`)
+    expect(cardRoot.parentElement?.className).toContain('overflow-x-auto')
+  })
+
+  it('never calls navigator.share, even when the platform provides it', async () => {
     const share = vi.fn(async () => {})
-    vi.stubGlobal('navigator', { ...navigator, share })
+    const writeText = vi.fn(async () => {})
+    vi.stubGlobal('navigator', { ...navigator, share, clipboard: { writeText } })
 
     const b = bill({
       payerId: 'a',
@@ -43,12 +69,17 @@ describe('SummaryScreen', () => {
       lineItems: [{ id: '1', label: 'Pizza', amount: 1000, quantity: 1, shares: { a: 1 } }],
     })
     const { getByRole } = render(<SummaryScreen bill={b} />)
-    fireEvent.click(getByRole('button', { name: /share summary/i }))
 
-    await waitFor(() => expect(share).toHaveBeenCalledWith({ text: expect.stringContaining('Alice') }))
+    fireEvent.click(getByRole('button', { name: /copy text/i }))
+    await waitFor(() => expect(writeText).toHaveBeenCalled())
+
+    fireEvent.click(getByRole('button', { name: /download image/i }))
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+
+    expect(share).not.toHaveBeenCalled()
   })
 
-  it('falls back to a clipboard copy when the Web Share API is unavailable', async () => {
+  it('always copies the plain-text summary to the clipboard when Copy text is clicked', async () => {
     const writeText = vi.fn(async () => {})
     vi.stubGlobal('navigator', { ...navigator, share: undefined, clipboard: { writeText } })
 
@@ -58,64 +89,27 @@ describe('SummaryScreen', () => {
       lineItems: [{ id: '1', label: 'Pizza', amount: 1000, quantity: 1, shares: { a: 1 } }],
     })
     const { getByRole, findByText } = render(<SummaryScreen bill={b} />)
-    fireEvent.click(getByRole('button', { name: /share summary/i }))
+    fireEvent.click(getByRole('button', { name: /copy text/i }))
 
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('Alice')))
     expect(await findByText('Summary copied to clipboard')).toBeInTheDocument()
   })
 
-  it('falls back to the clipboard when the share sheet rejects with a real error, not a user cancellation', async () => {
-    const share = vi.fn(async () => {
-      throw new DOMException('Permission denied', 'NotAllowedError')
-    })
-    const writeText = vi.fn(async () => {})
-    vi.stubGlobal('navigator', { ...navigator, share, clipboard: { writeText } })
+  it('always saves the share image directly via the download anchor when Download image is clicked', async () => {
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
 
     const b = bill({
-      payerId: 'a',
       diners: [{ id: 'a', name: 'Alice', joinIndex: 0 }],
       lineItems: [{ id: '1', label: 'Pizza', amount: 1000, quantity: 1, shares: { a: 1 } }],
     })
     const { getByRole, findByText } = render(<SummaryScreen bill={b} />)
-    fireEvent.click(getByRole('button', { name: /share summary/i }))
+    fireEvent.click(getByRole('button', { name: /download image/i }))
 
-    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('Alice')))
-    expect(await findByText('Summary copied to clipboard')).toBeInTheDocument()
-  })
+    await waitFor(() => expect(clickSpy).toHaveBeenCalled())
+    expect(URL.createObjectURL).toHaveBeenCalled()
+    expect(await findByText('Image downloaded')).toBeInTheDocument()
 
-  it('reports nothing, and does not fall back, when the user simply cancels the share sheet', async () => {
-    const share = vi.fn(async () => {
-      throw new DOMException('Abort', 'AbortError')
-    })
-    const writeText = vi.fn(async () => {})
-    vi.stubGlobal('navigator', { ...navigator, share, clipboard: { writeText } })
-
-    const b = bill({
-      payerId: 'a',
-      diners: [{ id: 'a', name: 'Alice', joinIndex: 0 }],
-      lineItems: [{ id: '1', label: 'Pizza', amount: 1000, quantity: 1, shares: { a: 1 } }],
-    })
-    const { getByRole } = render(<SummaryScreen bill={b} />)
-    fireEvent.click(getByRole('button', { name: /share summary/i }))
-
-    await waitFor(() => expect(share).toHaveBeenCalled())
-    expect(writeText).not.toHaveBeenCalled()
-  })
-
-  it('renders a PNG from the same node as the on-screen ShareCard when sharing the image', async () => {
-    global.fetch = vi.fn(async () => new Response(new Blob(['stub'], { type: 'image/png' }))) as unknown as typeof fetch
-    const canShare = vi.fn(() => true)
-    const share = vi.fn(async () => {})
-    vi.stubGlobal('navigator', { ...navigator, share, canShare })
-
-    const b = bill({
-      diners: [{ id: 'a', name: 'Alice', joinIndex: 0 }],
-      lineItems: [{ id: '1', label: 'Pizza', amount: 1000, quantity: 1, shares: { a: 1 } }],
-    })
-    const { getByRole } = render(<SummaryScreen bill={b} />)
-    fireEvent.click(getByRole('button', { name: /share image/i }))
-
-    await waitFor(() => expect(share).toHaveBeenCalledWith(expect.objectContaining({ files: expect.any(Array) })))
+    clickSpy.mockRestore()
   })
 
   it('has no WCAG AAA violations', async () => {

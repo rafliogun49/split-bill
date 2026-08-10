@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import type { Bill, Split } from '../../domain'
 import { formatMoney } from '../../domain'
 import { copy } from '../copy'
@@ -24,14 +25,25 @@ function lineItemLabel(bill: Bill, lineItemId: string): string {
 // buildShareText so the two never drift: Place/Date, what the Payer is
 // owed, one card per Diner in their allocated colour, then who to pay and
 // the Bill total at the foot.
-export function ShareCard({ bill, split, locale }: ShareCardProps) {
+//
+// forwardRef so the PNG-capture ref (SummaryScreen) attaches directly to
+// this root element rather than to an unsized wrapper div around it — the
+// wrapper had no intrinsic width, so it stretched to fill its flex parent
+// and left this card sitting at its start edge instead of centred, and
+// html-to-image rasterised the wrapper's full (empty) width instead of the
+// card's own 480px.
+export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(function ShareCard(
+  { bill, split, locale },
+  ref,
+) {
   const payer = bill.diners.find((d) => d.id === bill.payerId)
   const payerSplit = payer ? split.diners.find((d) => d.dinerId === payer.id) : undefined
 
   return (
     <div
+      ref={ref}
       style={{ width: SHARE_CARD_WIDTH }}
-      className="flex flex-col gap-6 border border-pure-black bg-surface-container-lowest p-6 shadow-lg"
+      className="mx-auto flex flex-col gap-6 border border-pure-black bg-surface-container-lowest p-6 shadow-lg"
     >
       {(bill.place || bill.date) && (
         <div className="flex flex-col gap-1 border-b border-pure-black pb-4">
@@ -98,4 +110,4 @@ export function ShareCard({ bill, split, locale }: ShareCardProps) {
       </div>
     </div>
   )
-}
+})
