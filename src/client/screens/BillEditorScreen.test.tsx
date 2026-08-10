@@ -195,4 +195,49 @@ describe('BillEditorScreen', () => {
       expect(await axe(container)).toHaveNoViolations()
     })
   })
+
+  describe('SCANNED stamp', () => {
+    it('is absent when the Bill was entered by hand', () => {
+      const { queryByText } = render(<BillEditorScreen bill={emptyBill()} onBillChange={noop} onContinue={noop} />)
+      expect(queryByText('Scanned')).not.toBeInTheDocument()
+    })
+
+    it('renders on a match, independent of the reconciliation banner', () => {
+      const { getByText } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'match', computedTotal: 55000 }}
+        />,
+      )
+      expect(getByText('Scanned')).toBeInTheDocument()
+    })
+
+    it('renders on a mismatch too', () => {
+      const { getByText } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'mismatch', computedTotal: 156177, printedTotal: 159100, difference: -2923 }}
+        />,
+      )
+      expect(getByText('Scanned')).toBeInTheDocument()
+    })
+
+    it('renders even when there was no printed total to reconcile against, and no banner shows', () => {
+      const { getByText, queryByRole } = render(
+        <BillEditorScreen
+          bill={emptyBill()}
+          onBillChange={noop}
+          onContinue={noop}
+          reconciliation={{ status: 'no-printed-total', computedTotal: 55000 }}
+        />,
+      )
+      expect(getByText('Scanned')).toBeInTheDocument()
+      expect(queryByRole('status')).not.toBeInTheDocument()
+      expect(queryByRole('alert')).not.toBeInTheDocument()
+    })
+  })
 })

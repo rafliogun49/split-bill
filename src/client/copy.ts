@@ -81,6 +81,7 @@ export const copy = {
     retry: 'Try again',
   },
   billEditor: {
+    scannedBadge: 'Scanned',
     reconciliationMatch: 'Matches the receipt total.',
     reconciliationMismatchHeading: "Doesn't match the receipt",
     reconciliationComputed: 'Computed',
