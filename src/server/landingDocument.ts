@@ -31,7 +31,7 @@ const CANONICAL_URL = 'https://split-bill.rafsmith.com/'
 // drift from the redesigned landing content (issue #30's acceptance
 // criteria) without a copy change updating both.
 const LANDING_TITLE = `${copy.wordmark} — ${copy.start.tagline}`
-const LANDING_DESCRIPTION = `${copy.start.tagline} ${copy.start.footerTagline}`
+const LANDING_DESCRIPTION = `${copy.start.tagline} ${copy.start.footerNote}`
 
 // Escapes text content for interpolation into hand-written HTML strings.
 // `copy.ts` doesn't currently contain markup-significant characters, but
@@ -73,47 +73,34 @@ export function renderLandingContent(): string {
   const features = copy.start.features
     .map(
       (feature) => `
-        <li class="flex gap-3 border border-pure-black p-6">
-          <div>
-            <h3 class="text-headline-sm uppercase text-on-surface">${escapeHtml(feature.title)}</h3>
-            <p class="mt-1 text-body-md text-on-surface">${escapeHtml(feature.body)}</p>
-          </div>
-        </li>`,
+        <li class="border border-pure-black bg-surface-container-lowest p-4 text-label-bold text-on-surface">${escapeHtml(feature)}</li>`,
     )
     .join('')
 
   return `
     <div class="flex w-full flex-col items-center">
-      <section class="w-full">
-        <div class="mx-auto flex w-full max-w-4xl flex-col items-center gap-8 px-4 py-16 text-center">
-          <div>
-            <h1 class="text-display-xl uppercase text-on-surface">${escapeHtml(copy.wordmark)}</h1>
-            <p class="mt-4 text-headline-sm uppercase text-on-surface">${escapeHtml(copy.start.tagline)}</p>
+      <section class="w-full px-4 py-8">
+        <div class="mx-auto w-full max-w-4xl border border-pure-black">
+          <div class="bg-primary-container p-10 text-center">
+            <p class="text-label-bold uppercase text-on-surface">${escapeHtml(copy.wordmark)}</p>
+            <h1 class="mt-4 text-display-xl uppercase text-on-surface">${escapeHtml(copy.start.headline)}</h1>
+            <p class="mt-4 text-body-md text-on-surface">${escapeHtml(copy.start.tagline)}</p>
+            <p class="mt-4 text-label-bold uppercase text-on-surface">${escapeHtml(copy.start.photographReceipt)}</p>
+            <p class="text-label-sm text-on-surface-variant">${escapeHtml(copy.start.enterManually)}</p>
           </div>
-          <p class="text-headline-sm uppercase text-on-surface">${escapeHtml(copy.start.photographReceipt)}</p>
-          <p class="text-label-sm text-on-surface-variant">${escapeHtml(copy.start.enterManually)}</p>
-          <p class="text-label-sm text-on-surface-variant">${escapeHtml(copy.start.photoNeverStored)}</p>
+
+          <div class="border-t border-pure-black bg-surface-container-lowest p-10">
+            <h2 class="text-headline-sm uppercase text-on-surface">${escapeHtml(copy.start.howItWorksTitle)}</h2>
+            <ul class="grid grid-cols-1 gap-6 md:grid-cols-3">${howItWorks}</ul>
+            <ul class="mt-6 flex flex-col gap-3">${features}</ul>
+            <p class="mt-6 text-center text-label-sm text-on-surface-variant">${escapeHtml(copy.start.photoNeverStored)}</p>
+          </div>
+
+          <footer class="border-t border-pure-black bg-surface-container-lowest px-4 py-8 text-center">
+            <p class="text-label-sm text-on-surface-variant">${escapeHtml(copy.start.footerNote)}</p>
+          </footer>
         </div>
       </section>
-
-      <section class="w-full border-t border-pure-black bg-surface-variant px-4 py-16">
-        <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
-          <h2 class="text-center text-headline-md uppercase text-on-surface">${escapeHtml(copy.start.howItWorksTitle)}</h2>
-          <ul class="grid grid-cols-1 gap-6 md:grid-cols-3">${howItWorks}</ul>
-        </div>
-      </section>
-
-      <section class="w-full border-t border-pure-black px-4 py-16">
-        <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
-          <h2 class="text-center text-headline-md uppercase text-on-surface">${escapeHtml(copy.start.featuresTitle)}</h2>
-          <ul class="grid grid-cols-1 gap-6 md:grid-cols-3">${features}</ul>
-        </div>
-      </section>
-
-      <footer class="w-full border-t border-pure-black bg-surface-container-lowest px-4 py-8 text-center">
-        <p class="text-label-bold uppercase text-on-surface">${escapeHtml(copy.wordmark)}</p>
-        <p class="mt-1 text-label-sm text-on-surface-variant">${escapeHtml(copy.start.footerTagline)}</p>
-      </footer>
     </div>`
 }
 
@@ -136,7 +123,7 @@ function renderJsonLd(): string {
       price: '0',
       priceCurrency: 'USD',
     },
-    featureList: copy.start.features.map((feature) => feature.title),
+    featureList: copy.start.features,
   }
   return JSON.stringify(payload).replace(/</g, '\\u003c')
 }

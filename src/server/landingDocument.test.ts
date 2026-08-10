@@ -20,14 +20,13 @@ describe('renderLandingContent', () => {
   it('includes every feature', () => {
     const html = renderLandingContent()
     for (const feature of copy.start.features) {
-      expect(html).toContain(feature.title)
-      expect(html).toContain(feature.body)
+      expect(html).toContain(feature)
     }
   })
 
-  it('includes the footer tagline', () => {
+  it('includes the footer note', () => {
     const html = renderLandingContent()
-    expect(html).toContain(copy.start.footerTagline)
+    expect(html).toContain(copy.start.footerNote)
   })
 
   it('contains no script tags of its own', () => {
@@ -48,7 +47,7 @@ describe('renderLandingHead', () => {
     const head = renderLandingHead()
     expect(head).toMatch(/<meta name="description" content="[^"]*"/)
     expect(head).toContain(copy.start.tagline)
-    expect(head).toContain(copy.start.footerTagline)
+    expect(head).toContain(copy.start.footerNote)
   })
 
   it('includes OpenGraph tags', () => {
@@ -73,7 +72,7 @@ describe('renderLandingHead', () => {
     expect(jsonLd['@context']).toBe('https://schema.org')
     expect(jsonLd['@type']).toBe('SoftwareApplication')
     expect(jsonLd.name).toBe(copy.wordmark)
-    expect(jsonLd.featureList).toEqual(copy.start.features.map((feature) => feature.title))
+    expect(jsonLd.featureList).toEqual(copy.start.features)
   })
 })
 

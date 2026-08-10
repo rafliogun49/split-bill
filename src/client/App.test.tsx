@@ -28,7 +28,7 @@ const bill: Bill = {
 }
 
 function photograph(app: ReturnType<typeof render>) {
-  fireEvent.click(app.getByRole('button', { name: 'Scan receipt' }))
+  fireEvent.click(app.getByRole('button', { name: 'Scan a receipt' }))
   const input = app.container.querySelector('input[name="library-photo"]') as HTMLInputElement
   fireEvent.change(input, { target: { files: [new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })] } })
 }
@@ -59,24 +59,24 @@ describe('App', () => {
 
   it('opens on the Start screen with no Resume offered when nothing is persisted', () => {
     const { queryByRole, getByRole } = render(<App />)
-    expect(queryByRole('button', { name: 'Resume' })).not.toBeInTheDocument()
-    expect(getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument()
+    expect(queryByRole('button', { name: 'Resume this Bill' })).not.toBeInTheDocument()
+    expect(getByRole('button', { name: 'Scan a receipt' })).toBeInTheDocument()
   })
 
   it('offers Resume when a Bill was persisted from a previous session', () => {
     localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill }))
     const { getByRole } = render(<App />)
-    expect(getByRole('button', { name: 'Resume' })).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Resume this Bill' })).toBeInTheDocument()
   })
 
   it('discards the persisted Bill once New Bill is confirmed', () => {
     localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill }))
     const { getByRole, queryByRole } = render(<App />)
 
-    fireEvent.click(getByRole('button', { name: 'New Bill' }))
+    fireEvent.click(getByRole('button', { name: 'Start a New Bill' }))
     fireEvent.click(getByRole('button', { name: 'Discard and start new' }))
 
-    expect(queryByRole('button', { name: 'Resume' })).not.toBeInTheDocument()
+    expect(queryByRole('button', { name: 'Resume this Bill' })).not.toBeInTheDocument()
     expect(localStorage.getItem('split-bill:bill')).toBeNull()
   })
 
@@ -84,15 +84,15 @@ describe('App', () => {
     localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill }))
     const { getByRole } = render(<App />)
 
-    fireEvent.click(getByRole('button', { name: 'Resume' }))
+    fireEvent.click(getByRole('button', { name: 'Resume this Bill' }))
     fireEvent.click(getByRole('button', { name: 'Exit' }))
 
-    expect(getByRole('button', { name: 'Resume' })).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Resume this Bill' })).toBeInTheDocument()
   })
 
   it('opens the Bill editor on an empty Bill when entering manually', () => {
     const { getByRole } = render(<App />)
-    fireEvent.click(getByRole('button', { name: 'Enter manually' }))
+    fireEvent.click(getByRole('button', { name: 'Enter manually instead' }))
     expect(getByRole('button', { name: /add line item/i })).toBeInTheDocument()
   })
 
@@ -105,13 +105,13 @@ describe('App', () => {
       }),
     )
     const { getByRole, getByDisplayValue } = render(<App />)
-    fireEvent.click(getByRole('button', { name: 'Resume' }))
+    fireEvent.click(getByRole('button', { name: 'Resume this Bill' }))
     expect(getByDisplayValue('Nasi Goreng')).toBeInTheDocument()
   })
 
   it('a Bill typed by hand survives a reload, with the same total', () => {
     const { getByRole, getByLabelText, unmount } = render(<App />)
-    fireEvent.click(getByRole('button', { name: 'Enter manually' }))
+    fireEvent.click(getByRole('button', { name: 'Enter manually instead' }))
     fireEvent.click(getByRole('button', { name: /add line item/i }))
     fireEvent.change(getByLabelText('Line item name'), { target: { value: 'Nasi Goreng' } })
     const lineTotal = getByLabelText(/line total/i)
@@ -126,7 +126,7 @@ describe('App', () => {
     // Bill editor, no Resume click required (issue #22 acceptance: refreshing
     // Bill editor onward stays on that same screen).
     const reloaded = render(<App />)
-    expect(reloaded.queryByRole('button', { name: 'Resume' })).not.toBeInTheDocument()
+    expect(reloaded.queryByRole('button', { name: 'Resume this Bill' })).not.toBeInTheDocument()
     expect(reloaded.getByDisplayValue('Nasi Goreng')).toBeInTheDocument()
     expect(reloaded.getAllByText('Rp 90.000').length).toBeGreaterThan(0)
   })
@@ -142,7 +142,7 @@ describe('App', () => {
 
     it('goes to the Capture screen from Scan, not straight to the editor', () => {
       const app = render(<App />)
-      fireEvent.click(app.getByRole('button', { name: 'Scan receipt' }))
+      fireEvent.click(app.getByRole('button', { name: 'Scan a receipt' }))
       expect(app.getByRole('heading', { name: 'Scan receipt' })).toBeInTheDocument()
       expect(app.getByRole('button', { name: 'Scan photo' })).toBeInTheDocument()
     })
@@ -193,26 +193,26 @@ describe('App', () => {
     it('visiting the Bill editor URL with no active Bill in local storage redirects to Start', () => {
       window.history.replaceState(null, '', '/bill')
       const { getByRole } = render(<App />)
-      expect(getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Scan a receipt' })).toBeInTheDocument()
     })
 
     it('visiting the Assignment URL with no active Bill in local storage redirects to Start', () => {
       window.history.replaceState(null, '', '/assignment')
       const { getByRole } = render(<App />)
-      expect(getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Scan a receipt' })).toBeInTheDocument()
     })
 
     it('visiting the Summary URL with no active Bill in local storage redirects to Start', () => {
       window.history.replaceState(null, '', '/summary')
       const { getByRole } = render(<App />)
-      expect(getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Scan a receipt' })).toBeInTheDocument()
     })
 
     it('refreshing Diner setup with an active Bill in local storage stays on Diner setup', () => {
       localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill: filledBill }))
       window.history.replaceState(null, '', '/diners')
       const { getByText, queryByRole } = render(<App />)
-      expect(queryByRole('button', { name: 'Scan receipt' })).not.toBeInTheDocument()
+      expect(queryByRole('button', { name: 'Scan a receipt' })).not.toBeInTheDocument()
       expect(getByText('No Diners yet. Add the first one above.')).toBeInTheDocument()
     })
 
@@ -220,7 +220,7 @@ describe('App', () => {
       localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill: filledBill }))
       window.history.replaceState(null, '', '/assignment')
       const { getByText, queryByRole } = render(<App />)
-      expect(queryByRole('button', { name: 'Scan receipt' })).not.toBeInTheDocument()
+      expect(queryByRole('button', { name: 'Scan a receipt' })).not.toBeInTheDocument()
       expect(getByText('Nasi Goreng')).toBeInTheDocument()
     })
 
@@ -246,16 +246,16 @@ describe('App', () => {
 
     it('browser back from Capture returns to Start, in the order actually visited', async () => {
       const { getByRole } = render(<App />)
-      fireEvent.click(getByRole('button', { name: 'Scan receipt' }))
+      fireEvent.click(getByRole('button', { name: 'Scan a receipt' }))
       expect(getByRole('button', { name: 'Scan photo' })).toBeInTheDocument()
 
       window.history.back()
-      await waitFor(() => expect(getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument())
+      await waitFor(() => expect(getByRole('button', { name: 'Scan a receipt' })).toBeInTheDocument())
     })
 
     it('browser back from Diner setup returns to the Bill editor', async () => {
       const { getByRole, getByText } = render(<App />)
-      fireEvent.click(getByRole('button', { name: 'Enter manually' }))
+      fireEvent.click(getByRole('button', { name: 'Enter manually instead' }))
       fireEvent.click(getByRole('button', { name: 'Diners' }))
       expect(getByText('No Diners yet. Add the first one above.')).toBeInTheDocument()
 
@@ -276,7 +276,7 @@ describe('App', () => {
       })
       const app = render(<App />)
 
-      fireEvent.click(app.getByRole('button', { name: 'Scan receipt' }))
+      fireEvent.click(app.getByRole('button', { name: 'Scan a receipt' }))
       const input = app.container.querySelector('input[name="library-photo"]') as HTMLInputElement
       fireEvent.change(input, { target: { files: [new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })] } })
       await waitFor(() => expect(app.getByDisplayValue('Nasi Goreng')).toBeInTheDocument())
@@ -286,7 +286,7 @@ describe('App', () => {
       // screen with no request left to resume. Start now offers Resume
       // rather than the landing content, since parsing left a Bill behind.
       window.history.back()
-      await waitFor(() => expect(app.getByRole('button', { name: 'Resume' })).toBeInTheDocument())
+      await waitFor(() => expect(app.getByRole('button', { name: 'Resume this Bill' })).toBeInTheDocument())
       expect(app.queryByText('Reading your receipt')).not.toBeInTheDocument()
     })
 
@@ -304,7 +304,7 @@ describe('App', () => {
       // Resume rather than the landing content, since entering by hand left
       // a (blank) Bill behind.
       window.history.back()
-      await waitFor(() => expect(app.getByRole('button', { name: 'Resume' })).toBeInTheDocument())
+      await waitFor(() => expect(app.getByRole('button', { name: 'Resume this Bill' })).toBeInTheDocument())
       expect(app.queryByRole('alert')).not.toBeInTheDocument()
     })
 
@@ -318,7 +318,7 @@ describe('App', () => {
       expect(app.getByRole('button', { name: 'Scan photo' })).toBeInTheDocument()
 
       window.history.back()
-      await waitFor(() => expect(app.getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument())
+      await waitFor(() => expect(app.getByRole('button', { name: 'Scan a receipt' })).toBeInTheDocument())
       expect(app.queryByRole('alert')).not.toBeInTheDocument()
     })
   })
@@ -366,7 +366,7 @@ describe('App', () => {
       localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill }))
       const { getByRole } = render(<App />)
 
-      fireEvent.click(getByRole('button', { name: 'New Bill' }))
+      fireEvent.click(getByRole('button', { name: 'Start a New Bill' }))
       fireEvent.click(getByRole('button', { name: 'Discard and start new' }))
 
       const entries = readHistoryEntries()

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { copy } from '../client/copy'
 import app from './index'
 import type { Env } from './index'
 
@@ -38,7 +39,7 @@ describe('server', () => {
     expect(res.status).toBe(200)
     const html = await res.text()
     expect(html).not.toContain('<div id="root"></div>')
-    expect(html).toContain('Scan the receipt. Tag who had what.')
+    expect(html).toContain(copy.start.tagline)
     // The shell's own boot script must survive the splice untouched.
     expect(html).toContain('<script type="module" src="/assets/main-abc123.js"></script>')
   })

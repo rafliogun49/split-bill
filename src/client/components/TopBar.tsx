@@ -18,7 +18,7 @@ export interface TopBarProps {
 // destinations it ever carries.
 export function TopBar({ onExit, onHistory }: TopBarProps) {
   return (
-    <header className="sticky top-0 flex min-h-12 items-center justify-between border-b border-pure-black bg-surface-container-lowest px-4">
+    <header className="sticky top-0 z-20 flex min-h-12 items-center justify-between border-b border-pure-black bg-surface-container-lowest px-4">
       <span className="text-label-bold uppercase text-on-surface">{copy.wordmark}</span>
       <div className="flex items-center gap-4">
         <button
