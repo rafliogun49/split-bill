@@ -13,7 +13,7 @@ function lineItem(id: string, amount: number, shares: Record<string, number> = {
 }
 
 function bill(overrides: Partial<Bill>): Bill {
-  return { currency: idr, diners: [], lineItems: [], adjustments: [], ...overrides }
+  return { id: 'bill-1', currency: idr, diners: [], lineItems: [], adjustments: [], ...overrides }
 }
 
 describe('divideUnclaimedEvenly', () => {

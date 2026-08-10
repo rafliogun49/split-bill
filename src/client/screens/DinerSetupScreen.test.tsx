@@ -5,7 +5,7 @@ import type { Bill, Diner } from '../../domain'
 import { DinerSetupScreen } from './DinerSetupScreen'
 
 function emptyBill(overrides: Partial<Bill> = {}): Bill {
-  return { currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [], ...overrides }
+  return { id: 'bill-1', currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [], ...overrides }
 }
 
 function diner(id: string, name: string, joinIndex = 0): Diner {

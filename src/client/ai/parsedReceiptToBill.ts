@@ -21,6 +21,7 @@ export function parsedReceiptToBill(receipt: ParsedReceipt): Bill {
   }))
 
   return {
+    id: crypto.randomUUID(),
     currency: { code: receipt.currency.toUpperCase() },
     place: receipt.placeName,
     date: receipt.date,

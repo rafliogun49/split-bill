@@ -20,6 +20,7 @@ vi.mock('./ai/parseReceiptClient', async (importOriginal) => ({
 }))
 
 const bill: Bill = {
+  id: 'bill-1',
   currency: { code: 'IDR' },
   diners: [],
   lineItems: [],
@@ -319,6 +320,95 @@ describe('App', () => {
       window.history.back()
       await waitFor(() => expect(app.getByRole('button', { name: 'Scan receipt' })).toBeInTheDocument())
       expect(app.queryByRole('alert')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Local Bill History (issue #31)', () => {
+    const filledBill: Bill = {
+      ...bill,
+      lineItems: [{ id: 'a', label: 'Nasi Goreng', amount: 90000, quantity: 1, shares: {} }],
+    }
+
+    function readHistoryEntries(): Array<{ id: string }> {
+      const raw = localStorage.getItem('split-bill:bill-history')
+      return raw ? JSON.parse(raw).entries : []
+    }
+
+    it('presents the History icon on every screen, unlike the conditional Exit', () => {
+      const { getByRole, queryByRole } = render(<App />)
+      expect(getByRole('button', { name: 'History' })).toBeInTheDocument()
+      expect(queryByRole('button', { name: 'Exit' })).not.toBeInTheDocument()
+    })
+
+    it('the History icon navigates to the History screen from any screen', () => {
+      const { getByRole } = render(<App />)
+      fireEvent.click(getByRole('button', { name: 'History' }))
+      expect(getByRole('heading', { name: 'History' })).toBeInTheDocument()
+    })
+
+    it('shows an empty state explaining the list fills in over time when nothing is archived', () => {
+      const { getByRole, getByText } = render(<App />)
+      fireEvent.click(getByRole('button', { name: 'History' }))
+      expect(getByText(/fills in as Bills are finished or discarded/i)).toBeInTheDocument()
+    })
+
+    it('archives the active Bill into History when it reaches Summary', () => {
+      localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill: filledBill }))
+      window.history.replaceState(null, '', '/summary')
+      render(<App />)
+
+      const entries = readHistoryEntries()
+      expect(entries).toHaveLength(1)
+      expect(entries[0].id).toBe('bill-1')
+    })
+
+    it('archives the active Bill into History when New Bill is confirmed', () => {
+      localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill }))
+      const { getByRole } = render(<App />)
+
+      fireEvent.click(getByRole('button', { name: 'New Bill' }))
+      fireEvent.click(getByRole('button', { name: 'Discard and start new' }))
+
+      const entries = readHistoryEntries()
+      expect(entries).toHaveLength(1)
+      expect(entries[0].id).toBe('bill-1')
+    })
+
+    it("doesn't touch the active-Bill slot when archiving into History", () => {
+      localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill: filledBill }))
+      window.history.replaceState(null, '', '/summary')
+      render(<App />)
+
+      // The active-Bill slot is untouched by archiving — it's only cleared
+      // by New Bill (already asserted above) or naturally overwritten by a
+      // later edit, never by reaching Summary.
+      expect(localStorage.getItem('split-bill:bill')).not.toBeNull()
+    })
+
+    it('selecting a History entry reopens its Summary read-only, with no route back into the live editor', () => {
+      localStorage.setItem('split-bill:bill', JSON.stringify({ version: 1, bill: filledBill }))
+      window.history.replaceState(null, '', '/summary')
+      const app = render(<App />)
+      expect(app.getByRole('button', { name: 'Copy text' })).toBeInTheDocument()
+
+      fireEvent.click(app.getByRole('button', { name: 'History' }))
+      expect(app.getByRole('heading', { name: 'History' })).toBeInTheDocument()
+
+      // filledBill has no Place, so its row falls back to the placeholder.
+      fireEvent.click(app.getByRole('button', { name: /Untitled Bill/ }))
+
+      expect(window.location.pathname).toBe('/history/bill-1')
+      expect(app.getByRole('button', { name: 'Copy text' })).toBeInTheDocument()
+      // Nothing on this route can step back into the editor, Diner setup or
+      // Assignment — SummaryScreen carries no such controls at all.
+      expect(app.queryByRole('button', { name: 'Diners' })).not.toBeInTheDocument()
+      expect(app.queryByRole('button', { name: /add line item/i })).not.toBeInTheDocument()
+    })
+
+    it('a History link to an id that is no longer archived redirects back to the History list', () => {
+      window.history.replaceState(null, '', '/history/does-not-exist')
+      const { getByRole } = render(<App />)
+      expect(getByRole('heading', { name: 'History' })).toBeInTheDocument()
     })
   })
 })

@@ -112,6 +112,18 @@ export function UploadIcon({ className }: IconProps) {
   )
 }
 
+// TopBar's entry point into History (DESIGN.md §8 icon set: `clock`/list
+// glyph for the archive) — a clock face rather than a list glyph, since the
+// point of a History row is *when* a Bill was archived as much as what's in
+// it.
+export function HistoryIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Zm1-13h-2v6l5.2 3.1 1-1.6L13 11.4V7Z" />
+    </svg>
+  )
+}
+
 export function CopyIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">

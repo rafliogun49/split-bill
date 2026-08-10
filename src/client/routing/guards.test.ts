@@ -3,7 +3,9 @@ import { redirectWhenMissing } from './guards'
 
 describe('redirectWhenMissing', () => {
   it('returns null (proceed) when the value is present', () => {
-    expect(redirectWhenMissing({ currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [] }, '/')).toBeNull()
+    expect(
+      redirectWhenMissing({ id: 'bill-1', currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [] }, '/'),
+    ).toBeNull()
   })
 
   it('returns the fallback path when the value is null', () => {

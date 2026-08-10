@@ -14,6 +14,7 @@ function lineItem(id: string, amount: number, shares: Record<string, number> = {
 
 function bill(overrides: Partial<Bill>): Bill {
   return {
+    id: 'bill-1',
     currency: sgd,
     diners: [],
     lineItems: [],

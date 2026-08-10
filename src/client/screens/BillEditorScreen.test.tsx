@@ -5,7 +5,7 @@ import type { Bill } from '../../domain'
 import { BillEditorScreen } from './BillEditorScreen'
 
 function emptyBill(overrides: Partial<Bill> = {}): Bill {
-  return { currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [], ...overrides }
+  return { id: 'bill-1', currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [], ...overrides }
 }
 
 function noop() {}

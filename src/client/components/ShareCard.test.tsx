@@ -7,7 +7,7 @@ import { calculateSplit } from '../../domain'
 import { ShareCard, SHARE_CARD_WIDTH } from './ShareCard'
 
 function bill(overrides: Partial<Bill> = {}): Bill {
-  return { currency: { code: 'SGD' }, diners: [], lineItems: [], adjustments: [], ...overrides }
+  return { id: 'bill-1', currency: { code: 'SGD' }, diners: [], lineItems: [], adjustments: [], ...overrides }
 }
 
 describe('ShareCard', () => {

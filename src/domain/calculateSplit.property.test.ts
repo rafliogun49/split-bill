@@ -50,7 +50,7 @@ const billArb: fc.Arbitrary<Bill> = fc
   })
   .map(({ dinerIds, lineItems, adjustments }): Bill => {
     const diners: Diner[] = dinerIds.map((id, index) => ({ id, name: id, joinIndex: index }))
-    return { currency: { code: 'SGD' }, diners, lineItems, adjustments }
+    return { id: 'bill-1', currency: { code: 'SGD' }, diners, lineItems, adjustments }
   })
 
 describe('calculateSplit property: the sum invariant (ADR-0003)', () => {

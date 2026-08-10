@@ -6,6 +6,7 @@ export const copy = {
   wordmark: 'Split Bill',
   topBar: {
     exit: 'Exit',
+    history: 'History',
   },
   start: {
     tagline: 'Scan the receipt. Tag who had what.',
@@ -159,5 +160,11 @@ export const copy = {
     textCopied: 'Summary copied to clipboard',
     downloadImage: 'Download image',
     imageDownloaded: 'Image downloaded',
+  },
+  history: {
+    heading: 'History',
+    empty: "This fills in as Bills are finished or discarded — nothing's archived yet.",
+    untitledPlace: 'Untitled Bill',
+    archivedOn: 'Archived',
   },
 } as const

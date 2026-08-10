@@ -10,7 +10,7 @@ vi.mock('../share/captureShareImage', () => ({
 }))
 
 function bill(overrides: Partial<Bill> = {}): Bill {
-  return { currency: { code: 'SGD' }, diners: [], lineItems: [], adjustments: [], ...overrides }
+  return { id: 'bill-1', currency: { code: 'SGD' }, diners: [], lineItems: [], adjustments: [], ...overrides }
 }
 
 const originalFetch = global.fetch
