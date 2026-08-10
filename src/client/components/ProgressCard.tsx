@@ -1,4 +1,4 @@
-import { CameraIcon, CheckIcon } from '../icons'
+import { CheckIcon } from '../icons'
 import { Button } from './Button'
 import { Card } from './Card'
 
@@ -17,77 +17,75 @@ export interface ProgressCardProps {
   onCancel: () => void
 }
 
-// DESIGN.md §8: determinate track in surface-variant, fill in
-// primary-container, plus a step list; Cancel is a secondary Button. When
-// progress is null the fill slides rather than fabricating a percentage
-// (DESIGN.md screen 3) — aria-valuenow is omitted in that case for the same
-// reason, per the ARIA progressbar spec's own indeterminate convention.
-//
-// Issue #24: the icon badge (existing CameraIcon, no new glyph), track and
-// step list are sized up for more presence, and the active step pulses —
-// the Motion section's carve-out for this screen (DESIGN.md §5) is the only
-// place outside Start that's allowed to animate anything but shadow/position.
-// `motion-reduce:animate-none` drops the pulse for reduced-motion users;
-// aria-current already carries the same "this is the active step"
-// information for assistive tech, so nothing is lost. The badge fill is
-// surface-variant, not primary-container — DESIGN.md rule 3 reserves
-// primary-container for a button fill and nothing else, and surface-variant
-// is already the token for an "inert fill" (§2), which a purely decorative
-// badge is.
+const badgeFillByStatus: Record<ProgressStepStatus, string> = {
+  done: 'bg-diner-2',
+  active: 'bg-diner-1 animate-blink motion-reduce:animate-none',
+  pending: 'bg-surface-container-lowest',
+}
+
+// DESIGN.md screen 3 / Standalone.html screen 3: a receipt-shaped
+// illustration with a top-to-bottom scan-line replaces the old fill track,
+// and each step gets its own badge — green check (done), blinking blue
+// (active), plain white-with-border (pending, not a grey "inert" fill).
+// `role="progressbar"` moves onto the illustration itself, since that's the
+// element carrying the animation, and keeps the same honest-indeterminate
+// contract as before: aria-valuenow is omitted rather than fabricated when
+// `progress` is null (ARIA's own indeterminate convention). Motion
+// carve-out: DESIGN.md §5 allows this screen (and Start) to animate beyond
+// shadow/position; `motion-reduce:animate-none` still drops both the
+// scan-line and the active badge's blink for reduced-motion users.
 export function ProgressCard({ progress, steps, cancelLabel, onCancel }: ProgressCardProps) {
   const determinate = progress !== null
 
   return (
     <Card>
-      <div className="mb-6 flex justify-center">
+      <div className="flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-8">
         <div
-          className="flex h-20 w-20 items-center justify-center border border-pure-black bg-surface-variant shadow-md animate-pulse motion-reduce:animate-none"
-          aria-hidden="true"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={determinate ? Math.round(progress) : undefined}
+          className="relative h-[130px] w-[110px] shrink-0 overflow-hidden border border-pure-black bg-surface-container-lowest p-3.5"
         >
-          <CameraIcon className="h-10 w-10 text-on-surface" />
+          <div className="mb-2 h-2 w-[70%] bg-on-surface" />
+          <div className="mb-1.5 h-1.5 w-[90%] bg-surface-variant" />
+          <div className="mb-1.5 h-1.5 w-[60%] bg-surface-variant" />
+          <div className="mb-1.5 h-1.5 w-[75%] bg-surface-variant" />
+          <div className="mb-1.5 h-1.5 w-[50%] bg-surface-variant" />
+          <div className="h-1.5 w-[80%] bg-surface-variant" />
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-1 animate-scan bg-diner-1 motion-reduce:animate-none"
+          />
         </div>
-      </div>
 
-      <div
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={determinate ? Math.round(progress) : undefined}
-        className="h-8 w-full overflow-hidden border border-pure-black bg-surface-variant"
-      >
-        <div
-          className={
-            determinate
-              ? 'h-full bg-primary-container transition-[width] duration-300'
-              : 'h-full w-1/3 animate-progress-indeterminate bg-primary-container'
-          }
-          style={determinate ? { width: `${progress}%` } : undefined}
-        />
-      </div>
+        <div className="flex w-full flex-col gap-6">
+          <ol className="flex flex-col gap-3">
+            {steps.map((step) => (
+              <li
+                key={step.label}
+                aria-current={step.status === 'active' ? 'step' : undefined}
+                className={`flex items-center gap-3 text-body-md ${
+                  step.status === 'pending' ? 'text-on-surface-variant' : 'text-on-surface'
+                }`}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center border border-pure-black ${badgeFillByStatus[step.status]}`}
+                >
+                  {step.status === 'done' && <CheckIcon className="h-3.5 w-3.5 text-on-surface" />}
+                </span>
+                {step.label}
+              </li>
+            ))}
+          </ol>
 
-      <ol className="mt-6 flex flex-col gap-3">
-        {steps.map((step) => (
-          <li
-            key={step.label}
-            aria-current={step.status === 'active' ? 'step' : undefined}
-            className={`flex items-center gap-3 text-body-md ${
-              step.status === 'pending' ? 'text-on-surface-variant' : 'text-on-surface'
-            } ${step.status === 'active' ? 'animate-pulse motion-reduce:animate-none' : ''}`}
-          >
-            {step.status === 'done' ? (
-              <CheckIcon className="h-5 w-5 shrink-0" />
-            ) : (
-              <span className="h-5 w-5 shrink-0" aria-hidden="true" />
-            )}
-            {step.label}
-          </li>
-        ))}
-      </ol>
-
-      <div className="mt-6">
-        <Button variant="secondary" onClick={onCancel}>
-          {cancelLabel}
-        </Button>
+          <div>
+            <Button variant="secondary" onClick={onCancel}>
+              {cancelLabel}
+            </Button>
+          </div>
+        </div>
       </div>
     </Card>
   )
