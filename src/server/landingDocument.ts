@@ -6,6 +6,33 @@ import { copy } from '../client/copy'
 // route leaves it untouched (ADR-0010).
 const ROOT_PLACEHOLDER = '<div id="root"></div>'
 
+// The shell's static `<title>`, swapped out for the landing-specific head
+// block built by `renderLandingHead()`. Every other route keeps this title
+// unchanged (ADR-0010).
+const SHELL_TITLE = '<title>Split Bill</title>'
+
+// The shell also ships a blanket `noindex` plus the comment explaining it
+// (repo-root `index.html`, issue #30) so every non-root route is uniformly
+// uncrawlable without each of them needing to know that. The landing
+// document is the one route that *should* be indexed, so this splice strips
+// both back out — matched together so the explanatory comment (which talks
+// about the tag it sits above) never survives without it.
+const NOINDEX_BLOCK = /<!--[\s\S]*?-->\s*<meta name="robots" content="noindex" \/>\s*/
+
+// The deployed origin (see deployment notes / Cloudflare Workers routing) —
+// used for the canonical link, OpenGraph `url`, and JSON-LD `url` below.
+// There is no single source of truth for this in the repo (no env var, no
+// config file carries it), so it's a literal here, same as `copy.ts`'s
+// strings are literals.
+const CANONICAL_URL = 'https://split-bill.rafsmith.com/'
+
+// Title and meta description are composed from `copy.start.*` — the exact
+// strings visible on the page — rather than hand-written, so neither can
+// drift from the redesigned landing content (issue #30's acceptance
+// criteria) without a copy change updating both.
+const LANDING_TITLE = `${copy.wordmark} — ${copy.start.tagline}`
+const LANDING_DESCRIPTION = `${copy.start.tagline} ${copy.start.footerTagline}`
+
 // Escapes text content for interpolation into hand-written HTML strings.
 // `copy.ts` doesn't currently contain markup-significant characters, but
 // this keeps the generator safe if it ever does.
@@ -90,6 +117,47 @@ export function renderLandingContent(): string {
     </div>`
 }
 
+// Builds the `SoftwareApplication` JSON-LD payload (issue #30's acceptance
+// criteria). `featureList` mirrors `copy.start.features` so it can't assert
+// anything the visible page doesn't already say. Escapes `<` so a future
+// copy string containing e.g. "</script>" can't break out of the JSON-LD
+// script tag it's embedded in below.
+function renderJsonLd(): string {
+  const payload = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: copy.wordmark,
+    description: LANDING_DESCRIPTION,
+    url: CANONICAL_URL,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any (web browser)',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    featureList: copy.start.features.map((feature) => feature.title),
+  }
+  return JSON.stringify(payload).replace(/</g, '\\u003c')
+}
+
+// The landing document's `<head>` additions: a real `<title>`, meta
+// description, OpenGraph tags, and a `SoftwareApplication` JSON-LD block
+// (issue #30's acceptance criteria) — all sourced from `copy.start.*` so
+// they can't drift from the visible page content. Pure string generation,
+// same seam as `renderLandingContent` — directly testable, no DOM/fetch.
+export function renderLandingHead(): string {
+  return `<title>${escapeHtml(LANDING_TITLE)}</title>
+    <meta name="description" content="${escapeHtml(LANDING_DESCRIPTION)}" />
+    <link rel="canonical" href="${CANONICAL_URL}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="${escapeHtml(copy.wordmark)}" />
+    <meta property="og:title" content="${escapeHtml(LANDING_TITLE)}" />
+    <meta property="og:description" content="${escapeHtml(LANDING_DESCRIPTION)}" />
+    <meta property="og:url" content="${CANONICAL_URL}" />
+    <script type="application/ld+json">${renderJsonLd()}</script>`
+}
+
 // Splices `renderLandingContent()`'s markup into the app's built shell
 // (`dist/client/index.html`, fetched from the Workers Assets binding at
 // request time — see the `/` route in `src/server/index.ts`) by replacing
@@ -102,5 +170,15 @@ export function buildLandingDocument(shellHtml: string): string {
   if (!shellHtml.includes(ROOT_PLACEHOLDER)) {
     throw new Error(`landingDocument: expected shell HTML to contain '${ROOT_PLACEHOLDER}'`)
   }
-  return shellHtml.replace(ROOT_PLACEHOLDER, `<div id="root">${renderLandingContent()}</div>`)
+  if (!shellHtml.includes(SHELL_TITLE)) {
+    throw new Error(`landingDocument: expected shell HTML to contain '${SHELL_TITLE}'`)
+  }
+
+  const withHead = shellHtml
+    // The landing document is the one route meant to be indexed — every
+    // other route keeps the shell's blanket noindex untouched (ADR-0010).
+    .replace(NOINDEX_BLOCK, '')
+    .replace(SHELL_TITLE, renderLandingHead())
+
+  return withHead.replace(ROOT_PLACEHOLDER, `<div id="root">${renderLandingContent()}</div>`)
 }

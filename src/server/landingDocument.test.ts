@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { copy } from '../client/copy'
-import { buildLandingDocument, renderLandingContent } from './landingDocument'
+import { buildLandingDocument, renderLandingContent, renderLandingHead } from './landingDocument'
 
 describe('renderLandingContent', () => {
   it('includes the wordmark and hero tagline', () => {
@@ -38,9 +38,51 @@ describe('renderLandingContent', () => {
   })
 })
 
+describe('renderLandingHead', () => {
+  it('includes a title built from the wordmark and tagline', () => {
+    const head = renderLandingHead()
+    expect(head).toContain(`<title>${copy.wordmark} — ${copy.start.tagline}</title>`)
+  })
+
+  it('includes a meta description sourced from copy.start', () => {
+    const head = renderLandingHead()
+    expect(head).toMatch(/<meta name="description" content="[^"]*"/)
+    expect(head).toContain(copy.start.tagline)
+    expect(head).toContain(copy.start.footerTagline)
+  })
+
+  it('includes OpenGraph tags', () => {
+    const head = renderLandingHead()
+    expect(head).toContain('property="og:title"')
+    expect(head).toContain('property="og:description"')
+    expect(head).toContain('property="og:type" content="website"')
+    expect(head).toContain('property="og:url"')
+    expect(head).toContain('property="og:site_name"')
+  })
+
+  it('includes a canonical link', () => {
+    expect(renderLandingHead()).toMatch(/<link rel="canonical" href="https:\/\/[^"]+" \/>/)
+  })
+
+  it('includes a valid SoftwareApplication JSON-LD block', () => {
+    const head = renderLandingHead()
+    const match = head.match(/<script type="application\/ld\+json">(.+)<\/script>/)
+    expect(match).not.toBeNull()
+
+    const jsonLd = JSON.parse(match![1])
+    expect(jsonLd['@context']).toBe('https://schema.org')
+    expect(jsonLd['@type']).toBe('SoftwareApplication')
+    expect(jsonLd.name).toBe(copy.wordmark)
+    expect(jsonLd.featureList).toEqual(copy.start.features.map((feature) => feature.title))
+  })
+})
+
 describe('buildLandingDocument', () => {
   const shell =
     '<!doctype html><html><head><title>Split Bill</title></head><body><div id="root"></div><script type="module" src="/assets/main-abc123.js"></script></body></html>'
+
+  const shellWithNoindex =
+    '<!doctype html><html><head><!-- explains the tag below --><meta name="robots" content="noindex" /><title>Split Bill</title></head><body><div id="root"></div><script type="module" src="/assets/main-abc123.js"></script></body></html>'
 
   it('replaces the empty root div with landing content', () => {
     const html = buildLandingDocument(shell)
@@ -51,10 +93,31 @@ describe('buildLandingDocument', () => {
   it('preserves the rest of the shell untouched', () => {
     const html = buildLandingDocument(shell)
     expect(html).toContain('<script type="module" src="/assets/main-abc123.js"></script>')
-    expect(html).toContain('<title>Split Bill</title>')
+  })
+
+  it('replaces the shell title with the landing-specific title', () => {
+    const html = buildLandingDocument(shell)
+    expect(html).not.toContain('<title>Split Bill</title>')
+    expect(html).toContain(`<title>${copy.wordmark} — ${copy.start.tagline}</title>`)
+  })
+
+  it('includes the JSON-LD block', () => {
+    expect(buildLandingDocument(shell)).toContain('application/ld+json')
+  })
+
+  it('strips the shell noindex tag and its explanatory comment out of the landing document', () => {
+    const html = buildLandingDocument(shellWithNoindex)
+    expect(html).not.toContain('noindex')
+    expect(html).not.toContain('explains the tag below')
   })
 
   it('throws if the shell has no empty root placeholder to splice into', () => {
-    expect(() => buildLandingDocument('<html><body>no root here</body></html>')).toThrow()
+    expect(() =>
+      buildLandingDocument('<html><head><title>Split Bill</title></head><body>no root here</body></html>'),
+    ).toThrow()
+  })
+
+  it('throws if the shell has no title tag to replace', () => {
+    expect(() => buildLandingDocument('<html><head></head><body><div id="root"></div></body></html>')).toThrow()
   })
 })

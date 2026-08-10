@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Split Bill (ADR-0010): only the landing page is prerendered/indexable. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://split-bill.rafsmith.com/</loc>
+  </url>
+</urlset>

@@ -1,0 +1,17 @@
+# Split Bill
+
+> Split Bill turns a photo of a restaurant receipt — or a Bill entered by hand — into a fair Split between the Diners who shared it. Assign each Line Item to a Diner, and Adjustments (tax, service charge, discounts) are shared pro-rata by what each Diner actually ordered, not an even share.
+
+Split Bill has no accounts and no server-side storage. A Bill lives only in the browser that created it (ADR-0001: client-only state); nothing is synced or sent to a server except a receipt photo submitted for one-time parsing, which is never stored afterward. Past Bills are kept in Local Bill History, also on-device only, until the user clears it.
+
+## Usage
+
+- Scan a receipt photo, or enter a Bill's Line Items and Adjustments by hand.
+- Add Diners and tag who had what; a shared Line Item splits between everyone who claims it.
+- Adjustments (tax, service charge, discounts) resolve in order and are allocated pro-rata by each Diner's Subtotal.
+- The Summary shows what each Diner owes the Payer, and can be copied as text or downloaded as an image.
+- History (`/history`) lists past Bills that reached Summary or were discarded — read-only, on this device only.
+
+## Crawling
+
+Only the landing page (`/`) is meant to be indexed — see `/robots.txt`. Every other route is a live or archived view of one specific person's Bill: nothing there is shared content, and none of it is discoverable to a crawler by design.

@@ -1,0 +1,18 @@
+# Split Bill (ADR-0010): only the landing page is meant to be crawled.
+# Everything from Start's active-Bill state onward is a client-only view of
+# one person's in-progress or archived Bill (ADR-0001) — there is nothing
+# there that is the same for two visitors, so it stays undiscoverable.
+#
+# Disallow is a prefix match, so "/history" also covers "/history/:id"
+# entries (src/client/routing/paths.ts) without listing each one.
+User-agent: *
+Disallow: /capture
+Disallow: /parsing
+Disallow: /parse-failure
+Disallow: /bill
+Disallow: /diners
+Disallow: /assignment
+Disallow: /summary
+Disallow: /history
+
+Sitemap: https://split-bill.rafsmith.com/sitemap.xml
