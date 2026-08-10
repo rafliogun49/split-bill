@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
-import { borderRadius, borderWidth, boxShadow, colors, dotTexture, fontFamily, typeScale } from './src/design/tokens'
+import { borderRadius, borderWidth, boxShadow, colors, fontFamily, typeScale } from './src/design/tokens'
 
 // Emits one `.text-{token}` utility per DESIGN.md type-scale row, carrying
 // font-family/size/line-height/weight/tracking together — Tailwind's built-in
@@ -31,18 +31,6 @@ const typeScalePlugin = plugin(({ addUtilities, theme }) => {
   }
 
   addUtilities(utilities as Parameters<typeof addUtilities>[0])
-})
-
-// DESIGN.md §8 Ornament: the dot-textured page background, emitted as a
-// utility (rather than an inline style) so it composes with the rest of the
-// className list on the app-shell element in App.tsx.
-const dotTexturePlugin = plugin(({ addUtilities }) => {
-  addUtilities({
-    '.bg-dot-texture': {
-      backgroundImage: dotTexture.backgroundImage,
-      backgroundSize: dotTexture.backgroundSize,
-    },
-  })
 })
 
 export default {
@@ -90,5 +78,5 @@ export default {
       },
     },
   },
-  plugins: [typeScalePlugin, dotTexturePlugin],
+  plugins: [typeScalePlugin],
 } satisfies Config

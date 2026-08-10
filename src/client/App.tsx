@@ -171,7 +171,7 @@ function AppShell() {
   const onExit = location.pathname !== paths.start ? () => navigate(paths.start) : undefined
 
   return (
-    <div className="bg-dot-texture flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
       <TopBar onExit={onExit} onHistory={() => navigate(paths.history)} />
       <main className="flex flex-1 flex-col">
         <Routes>
