@@ -14,7 +14,6 @@ import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { focusRing } from '../components/focusRing'
 import { LineItemRow } from '../components/LineItemRow'
-import { ScannedStamp } from '../components/ScannedStamp'
 import { StickySummaryBar } from '../components/StickySummaryBar'
 import { TextField } from '../components/TextField'
 
@@ -48,12 +47,6 @@ export function BillEditorScreen({ bill, onBillChange, onContinue, reconciliatio
   const split = calculateSplit(bill)
   const locale = localeForCurrency(bill.currency.code)
   const showPlaceDate = placeDateRevealed || Boolean(bill.place || bill.date)
-  // A reconciliation is only ever handed down when this Bill was pre-filled
-  // from a photo parse (ParseReconciliation's own docstring); its `status`
-  // tells us whether the totals matched, but the stamp cares only about
-  // presence — it renders the same for 'match', 'mismatch' and
-  // 'no-printed-total' alike (DESIGN.md §8 Ornament).
-  const isScanned = reconciliation !== undefined
   // Every amount is an integer in the Bill's own minor unit (CONTEXT.md
   // invariants) — switching currency once amounts exist would silently
   // reinterpret them under a different minor-unit convention (e.g. 90000
@@ -90,10 +83,8 @@ export function BillEditorScreen({ bill, onBillChange, onContinue, reconciliatio
   }
 
   return (
-    <div className="relative flex flex-1 flex-col gap-6 p-4 pb-28 lg:flex-row lg:items-start lg:gap-6 lg:p-6 lg:pb-6">
-      {isScanned && <ScannedStamp />}
-
-      <div className="flex flex-1 flex-col gap-6 lg:min-w-0 lg:grow-[7] lg:basis-0">
+    <div className="flex flex-1 flex-col gap-6 p-4 pb-28 lg:flex-row lg:items-start lg:gap-6 lg:p-6 lg:pb-6">
+      <div className="flex flex-1 flex-col gap-6">
         {reconciliation?.status === 'match' && (
           <Banner variant="neutral">
             <p className="text-body-md">{copy.billEditor.reconciliationMatch}</p>
@@ -240,15 +231,7 @@ export function BillEditorScreen({ bill, onBillChange, onContinue, reconciliatio
             </div>
           </div>
         </Card>
-      </div>
 
-      {/* lg:top-12 matches TopBar's own min-h-12 (App.tsx) so this column's
-          sticky offset sits flush under it rather than overlapping or
-          gapping — same convention as AssignmentScreen's sidebar. DESIGN.md
-          screen 5 / the mockup: Adjustments + the running total move into
-          this sticky right-hand sidebar on desktop instead of stacking below
-          Line Items; mobile keeps the same stacked order via flex-col. */}
-      <div className="flex flex-col gap-6 lg:sticky lg:top-12 lg:grow-[5] lg:basis-0">
         <Card>
           <h2 className="text-headline-sm uppercase text-on-surface">{copy.billEditor.adjustmentsHeading}</h2>
           <div className="mt-4 flex flex-col">
@@ -283,7 +266,9 @@ export function BillEditorScreen({ bill, onBillChange, onContinue, reconciliatio
             </span>
           </Button>
         </Card>
+      </div>
 
+      <div className="lg:w-80">
         <StickySummaryBar
           label={copy.billEditor.total}
           amount={split.total}
