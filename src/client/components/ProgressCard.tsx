@@ -27,6 +27,8 @@ const badgeFillByStatus: Record<ProgressStepStatus, string> = {
 // illustration with a top-to-bottom scan-line replaces the old fill track,
 // and each step gets its own badge — green check (done), blinking blue
 // (active), plain white-with-border (pending, not a grey "inert" fill).
+// Illustration, step list and Cancel stack in one centered column at every
+// width — a side-by-side split read as cluttered in review.
 // `role="progressbar"` moves onto the illustration itself, since that's the
 // element carrying the animation, and keeps the same honest-indeterminate
 // contract as before: aria-valuenow is omitted rather than fabricated when
@@ -39,7 +41,7 @@ export function ProgressCard({ progress, steps, cancelLabel, onCancel }: Progres
 
   return (
     <Card>
-      <div className="flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-8">
+      <div className="flex flex-col items-center gap-6">
         <div
           role="progressbar"
           aria-valuemin={0}
@@ -61,33 +63,29 @@ export function ProgressCard({ progress, steps, cancelLabel, onCancel }: Progres
           />
         </div>
 
-        <div className="flex w-full flex-col gap-6">
-          <ol className="flex flex-col gap-3">
-            {steps.map((step) => (
-              <li
-                key={step.label}
-                aria-current={step.status === 'active' ? 'step' : undefined}
-                className={`flex items-center gap-3 text-body-md ${
-                  step.status === 'pending' ? 'text-on-surface-variant' : 'text-on-surface'
-                }`}
+        <ol className="flex flex-col gap-3">
+          {steps.map((step) => (
+            <li
+              key={step.label}
+              aria-current={step.status === 'active' ? 'step' : undefined}
+              className={`flex items-center gap-3 text-body-md ${
+                step.status === 'pending' ? 'text-on-surface-variant' : 'text-on-surface'
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className={`flex h-5 w-5 shrink-0 items-center justify-center border border-pure-black ${badgeFillByStatus[step.status]}`}
               >
-                <span
-                  aria-hidden="true"
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center border border-pure-black ${badgeFillByStatus[step.status]}`}
-                >
-                  {step.status === 'done' && <CheckIcon className="h-3 w-3 text-on-surface" />}
-                </span>
-                {step.label}
-              </li>
-            ))}
-          </ol>
+                {step.status === 'done' && <CheckIcon className="h-3 w-3 text-on-surface" />}
+              </span>
+              {step.label}
+            </li>
+          ))}
+        </ol>
 
-          <div>
-            <Button variant="secondary" onClick={onCancel}>
-              {cancelLabel}
-            </Button>
-          </div>
-        </div>
+        <Button variant="secondary" onClick={onCancel}>
+          {cancelLabel}
+        </Button>
       </div>
     </Card>
   )
