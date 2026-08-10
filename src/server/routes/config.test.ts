@@ -9,6 +9,7 @@ const env: Env = {
   TURNSTILE_SECRET_KEY: 'test-turnstile-secret',
   TURNSTILE_SITE_KEY: 'test-turnstile-site-key',
   PARSE_RATE_LIMITER: { limit: vi.fn(async () => ({ success: true })) },
+  ASSETS: { fetch: async () => new Response(null, { status: 404 }) } as unknown as Fetcher,
 }
 
 describe('GET /api/config', () => {

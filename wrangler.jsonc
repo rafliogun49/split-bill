@@ -5,8 +5,18 @@
   "main": "src/server/index.ts",
   "assets": {
     "directory": "./dist/client",
+    // Lets the Worker fetch the built shell itself (issue #29) — it splices
+    // real landing content into it for `/` instead of hand-assembling
+    // <script>/<link> tags, so it stays correct as Vite's hashed asset
+    // filenames change from build to build.
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
+    // "/" is intercepted so the Worker can serve the prerendered landing
+    // document (issue #29 / ADR-0010) instead of the plain SPA shell. Every
+    // other non-API path is unlisted here on purpose — it keeps falling
+    // through to the static-assets layer's `not_found_handling` above,
+    // which serves the minimal shell unchanged.
+    "run_worker_first": ["/", "/api/*"]
   },
   "observability": {
     "enabled": true
