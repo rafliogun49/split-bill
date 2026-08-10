@@ -17,19 +17,27 @@ describe('colour tokens', () => {
     }
   })
 
-  it('no token except background and surface-container-lowest is #FFFFFF', () => {
+  it('no token is pure white — the confirmed mockup has no white fill', () => {
     const white = Object.entries(colors)
       .filter(([, value]) => value.toUpperCase() === '#FFFFFF')
       .map(([key]) => key)
-      .sort()
 
-    expect(white).toEqual(['background', 'surface-container-lowest'])
+    expect(white).toEqual([])
   })
 
   it('every deleted token is absent from the palette', () => {
     for (const token of deletedColorTokens) {
       expect(colors, token).not.toHaveProperty(token)
     }
+  })
+
+  it('on-surface and on-background are the warm ink value, distinct from pure-black', () => {
+    expect(colors['on-surface']).toBe(colors['on-background'])
+    expect(colors['on-surface']).not.toBe(colors['pure-black'])
+  })
+
+  it('surface-variant reuses the disabled fill (no distinct inert/track value in the mockup)', () => {
+    expect(colors['surface-variant']).toBe(colors.disabled)
   })
 })
 

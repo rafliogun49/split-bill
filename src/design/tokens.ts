@@ -5,30 +5,32 @@
 export const colors = {
   transparent: 'transparent',
   current: 'currentColor',
-  background: '#FFFFFF',
-  'surface-container-lowest': '#FFFFFF',
-  'surface-variant': '#E2E2E2',
+  background: '#EDE6DC',
+  'surface-container-lowest': '#FFF7ED',
+  // No distinct inert/track fill exists in the confirmed mockup — reuses `disabled`.
+  'surface-variant': '#E7E7E7',
   'pure-black': '#000000',
-  'on-surface': '#000000',
-  'on-background': '#000000',
-  'on-surface-variant': '#424750',
-  'primary-container': '#8AB4F8',
-  'error-container': '#FCA5A5',
-  disabled: '#E5E5E5',
-  'diner-1': '#FDE68A',
-  'diner-2': '#FDBA74',
-  'diner-3': '#F9A8D4',
-  'diner-4': '#A7F3D0',
-  'diner-5': '#C4B5FD',
-  'diner-6': '#A5F3FC',
+  // Warm near-black ink, deliberately distinct from `pure-black` (borders/shadows).
+  'on-surface': '#1A1720',
+  'on-background': '#1A1720',
+  'on-surface-variant': '#4A4458',
+  'primary-container': '#FF936A',
+  'error-container': '#FF7E8E',
+  disabled: '#E7E7E7',
+  'diner-1': '#66D4FC',
+  'diner-2': '#A4D589',
+  'diner-3': '#EFA9E8',
+  'diner-4': '#E6BE68',
+  'diner-5': '#61DCC7',
+  'diner-6': '#B5BCFF',
 } as const
 
 export type ColorToken = keyof typeof colors
 
 // Text-role tokens: read as ink on a light ground, not as a fill that
 // needs to host black text on top of it. Excluded from the fill-contrast
-// check below (see tokens.test.ts for why on-surface-variant's 9.3:1 in
-// DESIGN.md is measured against white, not black).
+// check below (see tokens.test.ts for why on-surface-variant's ratios in
+// DESIGN.md are measured against the two page grounds, not black).
 export const textColorTokens: ColorToken[] = [
   'pure-black',
   'on-surface',
