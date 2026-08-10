@@ -17,13 +17,29 @@ describe('colour tokens', () => {
     }
   })
 
-  it('no token except background and surface-container-lowest is #FFFFFF', () => {
+  it('no token is pure white — the page ground is a warm off-white, not #FFFFFF', () => {
     const white = Object.entries(colors)
       .filter(([, value]) => value.toUpperCase() === '#FFFFFF')
       .map(([key]) => key)
-      .sort()
 
-    expect(white).toEqual(['background', 'surface-container-lowest'])
+    expect(white).toEqual([])
+  })
+
+  it('on-surface and on-background clear AAA (7:1) against both grounds, and are distinct from pure-black', () => {
+    const grounds = [colors.background, colors['surface-container-lowest']]
+    for (const token of ['on-surface', 'on-background', 'on-surface-variant'] as const) {
+      for (const ground of grounds) {
+        const ratio = contrastRatio(colors[token], ground)
+        expect(ratio, `${token} (${colors[token]}) vs ${ground}`).toBeGreaterThanOrEqual(7)
+      }
+    }
+
+    expect(colors['on-surface']).not.toBe(colors['pure-black'])
+    expect(colors['on-background']).not.toBe(colors['pure-black'])
+  })
+
+  it('surface-variant reuses disabled — no distinct inert/track value in the mockup (DESIGN.md §10)', () => {
+    expect(colors['surface-variant']).toBe(colors.disabled)
   })
 
   it('every deleted token is absent from the palette', () => {
