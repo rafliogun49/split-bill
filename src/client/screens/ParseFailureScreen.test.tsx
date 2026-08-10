@@ -38,6 +38,16 @@ describe('ParseFailureScreen', () => {
     expect(onRetry).toHaveBeenCalledOnce()
   })
 
+  it.each(reasons)('shows the large warning-triangle graphic above the headline, inside the alert band', (reason) => {
+    const { getByRole } = render(<ParseFailureScreen reason={reason} onRetry={vi.fn()} onEnterManually={vi.fn()} />)
+    const banner = getByRole('alert')
+    const triangle = banner.querySelector('svg')
+    expect(triangle).toBeInTheDocument()
+    // The triangle graphic precedes the heading text within the banner's markup.
+    const heading = banner.querySelector('p')
+    expect(triangle?.compareDocumentPosition(heading!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
   it('has no WCAG AAA violations for any failure reason', async () => {
     for (const reason of reasons) {
       const { container, unmount } = render(<ParseFailureScreen reason={reason} onRetry={vi.fn()} onEnterManually={vi.fn()} />)
