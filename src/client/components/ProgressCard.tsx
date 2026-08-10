@@ -47,12 +47,14 @@ export function ProgressCard({ progress, steps, cancelLabel, onCancel }: Progres
           aria-valuenow={determinate ? Math.round(progress) : undefined}
           className="relative h-[130px] w-[110px] shrink-0 overflow-hidden border border-pure-black bg-surface-container-lowest p-3.5"
         >
-          <div className="mb-2 h-2 w-[70%] bg-on-surface" />
-          <div className="mb-1.5 h-1.5 w-[90%] bg-surface-variant" />
-          <div className="mb-1.5 h-1.5 w-[60%] bg-surface-variant" />
-          <div className="mb-1.5 h-1.5 w-[75%] bg-surface-variant" />
-          <div className="mb-1.5 h-1.5 w-[50%] bg-surface-variant" />
-          <div className="h-1.5 w-[80%] bg-surface-variant" />
+          <div aria-hidden="true">
+            <div className="mb-2 h-2 w-[70%] bg-on-surface" />
+            <div className="mb-1.5 h-1.5 w-[90%] bg-surface-variant" />
+            <div className="mb-1.5 h-1.5 w-[60%] bg-surface-variant" />
+            <div className="mb-1.5 h-1.5 w-[75%] bg-surface-variant" />
+            <div className="mb-1.5 h-1.5 w-[50%] bg-surface-variant" />
+            <div className="h-1.5 w-[80%] bg-surface-variant" />
+          </div>
           <div
             aria-hidden="true"
             className="absolute inset-x-0 top-0 h-1 animate-scan bg-diner-1 motion-reduce:animate-none"
@@ -71,9 +73,9 @@ export function ProgressCard({ progress, steps, cancelLabel, onCancel }: Progres
               >
                 <span
                   aria-hidden="true"
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center border border-pure-black ${badgeFillByStatus[step.status]}`}
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center border border-pure-black ${badgeFillByStatus[step.status]}`}
                 >
-                  {step.status === 'done' && <CheckIcon className="h-3.5 w-3.5 text-on-surface" />}
+                  {step.status === 'done' && <CheckIcon className="h-3 w-3 text-on-surface" />}
                 </span>
                 {step.label}
               </li>
