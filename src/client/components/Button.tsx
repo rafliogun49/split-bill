@@ -26,15 +26,20 @@ const sizeClasses: Record<ButtonSize, string> = {
   hero: 'flex w-full flex-col items-center gap-3 px-6 py-10',
 }
 
+/**
+ * The hover/press choreography DESIGN.md §5 requires of every clickable
+ * surface — translate distances only, no shadow tier baked in, since
+ * one-off controls outside this component (e.g. CaptureScreen's square
+ * Library/shutter buttons) rest at a different shadow size than Button's
+ * own shadow-md. Callers pair this with their own `shadow-{size}
+ * hover:shadow-{next size}` classes.
+ */
+export const pressInteraction =
+  '[@media(hover:hover)]:hover:-translate-x-0.5 [@media(hover:hover)]:hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none transition-[transform,box-shadow] duration-100'
+
 export function Button({ variant = 'primary', size = 'default', disabled, type = 'button', ...props }: ButtonProps) {
   const fill = disabled ? 'bg-disabled' : variantFill[variant]
-  const interaction = disabled
-    ? 'shadow-none'
-    : [
-        'shadow-md',
-        '[@media(hover:hover)]:hover:-translate-x-0.5 [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-lg',
-        'active:translate-x-1 active:translate-y-1 active:shadow-none',
-      ].join(' ')
+  const interaction = disabled ? 'shadow-none' : `shadow-md [@media(hover:hover)]:hover:shadow-lg ${pressInteraction}`
 
   return (
     <button
@@ -44,7 +49,6 @@ export function Button({ variant = 'primary', size = 'default', disabled, type =
       className={[
         'border border-pure-black text-label-bold text-on-surface',
         sizeClasses[size],
-        'transition-[transform,box-shadow] duration-100',
         focusRing,
         fill,
         interaction,
