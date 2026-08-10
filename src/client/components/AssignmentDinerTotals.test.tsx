@@ -8,7 +8,7 @@ import { AssignmentDinerTotals } from './AssignmentDinerTotals'
 const currency = { code: 'IDR' }
 
 function bill(overrides: Partial<Bill> = {}): Bill {
-  return { currency, diners: [], lineItems: [], adjustments: [], ...overrides }
+  return { id: 'bill-1', currency, diners: [], lineItems: [], adjustments: [], ...overrides }
 }
 
 describe('AssignmentDinerTotals', () => {

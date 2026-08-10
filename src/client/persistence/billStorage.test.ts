@@ -3,6 +3,7 @@ import type { Bill } from '../../domain'
 import { clearBill, loadBill, saveBill } from './billStorage'
 
 const bill: Bill = {
+  id: 'bill-1',
   currency: { code: 'IDR' },
   place: 'Warung Tekko',
   diners: [{ id: 'd1', name: 'Rafli', joinIndex: 0 }],

@@ -48,6 +48,12 @@ export type Adjustment =
   | { kind: 'rate'; label: string; rateBps: number }
 
 export interface Bill {
+  /**
+   * Locally-generated, stable once assigned (crypto.randomUUID() at
+   * creation). Keys a History entry (ADR-0008) — never transmitted, never
+   * meaningful across devices, and irrelevant to the Split arithmetic.
+   */
+  id: string
   currency: Currency
   place?: string
   date?: string

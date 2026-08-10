@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react'
-import { useRef, useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router'
+import { useEffect, useRef, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router'
 import type { Bill } from '../domain'
 import type { ParseFailureReason, ParseReconciliation, ParsedReceipt } from './ai/parseReceiptClient'
 import { parsedReceiptToBill } from './ai/parsedReceiptToBill'
 import { TopBar } from './components/TopBar'
+import { archiveBill, getBillHistoryEntry, loadBillHistory } from './persistence/billHistory'
 import { clearBill, loadBill, saveBill } from './persistence/billStorage'
 import { redirectWhenMissing } from './routing/guards'
-import { paths } from './routing/paths'
+import { historyEntryPath, paths } from './routing/paths'
 import { AssignmentScreen } from './screens/AssignmentScreen'
 import { BillEditorScreen } from './screens/BillEditorScreen'
 import { CaptureScreen } from './screens/CaptureScreen'
 import { DinerSetupScreen } from './screens/DinerSetupScreen'
+import { HistoryScreen } from './screens/HistoryScreen'
 import { ParseFailureScreen } from './screens/ParseFailureScreen'
 import { ParsingScreen } from './screens/ParsingScreen'
 import { StartScreen } from './screens/StartScreen'
@@ -20,7 +22,7 @@ import { SummaryScreen } from './screens/SummaryScreen'
 // Manual entry always starts in the Bill currency worked throughout
 // DESIGN.md; the editor's own currency selector corrects it from there.
 function emptyBill(): Bill {
-  return { currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [] }
+  return { id: crypto.randomUUID(), currency: { code: 'IDR' }, diners: [], lineItems: [], adjustments: [] }
 }
 
 // Renders `children(value)` when `value` is present, or redirects to
@@ -47,6 +49,43 @@ function Guarded<T>({ value, fallback, children }: { value: T | null; fallback: 
   return <>{children(lastValue.current as T)}</>
 }
 
+// A Bill archives into History (ADR-0008) the moment it reaches Summary.
+// `archiveBill` upserts by id, so remounting here — a fresh navigation from
+// Assignment, or a reload landing straight back on /summary via the Guarded
+// bill-storage read — just re-writes the same entry rather than duplicating
+// it; see billHistory.ts for why that's the chosen behaviour over
+// archiving strictly once.
+function SummaryRoute({ bill }: { bill: Bill }) {
+  useEffect(() => {
+    archiveBill(bill)
+  }, [bill])
+
+  return <SummaryScreen bill={bill} />
+}
+
+// The read-only History entry (DESIGN.md screen 12): renders the same
+// SummaryScreen used by the live flow, but fed an immutable snapshot out of
+// billHistory.ts instead of the active-Bill state — there is no
+// onBillChange to wire up, so nothing rendered here can write back to it,
+// and nothing on this route links into the Bill editor, Diner setup or
+// Assignment. An id with no matching entry (a stale link, a cleared device)
+// bounces back to the History list rather than rendering broken state.
+function HistoryEntryRoute() {
+  const { id } = useParams<{ id: string }>()
+  const entry = id ? getBillHistoryEntry(id) : undefined
+
+  if (!entry) return <Navigate to={paths.history} replace />
+  return <SummaryScreen bill={entry.bill} />
+}
+
+// A thin wrapper so `loadBillHistory()` only runs while this route is
+// actually mounted, not on every AppShell render — Route `element` props
+// are evaluated eagerly by React even when that Route isn't the active
+// match.
+function HistoryRoute({ onSelect }: { onSelect: (id: string) => void }) {
+  return <HistoryScreen entries={loadBillHistory()} onSelect={onSelect} />
+}
+
 function AppShell() {
   const [bill, setBill] = useState<Bill | null>(() => loadBill())
   const [capturedFile, setCapturedFile] = useState<File | null>(null)
@@ -56,6 +95,11 @@ function AppShell() {
   const location = useLocation()
 
   function handleNewBill() {
+    // Archive whatever was active before discarding it (ADR-0008) — the
+    // other archive moment (SummaryRoute) only fires for a Bill that
+    // reached Summary, so a Bill discarded earlier in the flow needs this
+    // one to ever reach History at all.
+    if (bill) archiveBill(bill)
     clearBill()
     setBill(null)
     setReconciliation(undefined)
@@ -128,7 +172,7 @@ function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <TopBar onExit={onExit} />
+      <TopBar onExit={onExit} onHistory={() => navigate(paths.history)} />
       <main className="flex flex-1 flex-col">
         <Routes>
           <Route
@@ -217,10 +261,14 @@ function AppShell() {
             path={paths.summary}
             element={
               <Guarded value={bill} fallback={paths.start}>
-                {(activeBill) => <SummaryScreen bill={activeBill} />}
+                {(activeBill) => <SummaryRoute bill={activeBill} />}
               </Guarded>
             }
           />
+
+          <Route path={paths.history} element={<HistoryRoute onSelect={(id) => navigate(historyEntryPath(id))} />} />
+
+          <Route path={paths.historyEntry} element={<HistoryEntryRoute />} />
 
           <Route path="*" element={<Navigate to={paths.start} replace />} />
         </Routes>

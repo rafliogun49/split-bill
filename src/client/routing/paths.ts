@@ -11,4 +11,14 @@ export const paths = {
   diners: '/diners',
   assignment: '/assignment',
   summary: '/summary',
+  // History (issue #31 / ADR-0008) sits outside the linear flow above — a
+  // TopBar icon reaches it from any screen, and an entry always opens a
+  // read-only Summary, never rejoining the flow (DESIGN.md §9 screen 12).
+  history: '/history',
+  historyEntry: '/history/:id',
 } as const
+
+/** Builds the read-only Summary URL for one archived Bill's History id. */
+export function historyEntryPath(id: string): string {
+  return `/history/${id}`
+}
