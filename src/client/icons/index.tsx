@@ -89,6 +89,11 @@ export function ChevronIcon({ className }: IconProps) {
   )
 }
 
+// Unused since #28 retired the native-share flow on Summary (screen 10) in
+// favour of always-on Copy text / Download image buttons, which don't carry
+// icons of their own. Kept because DESIGN.md §8's closed icon set still
+// names `share` as one of the ~14 glyphs — remove both together if a future
+// change drops it from the set.
 export function ShareIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">

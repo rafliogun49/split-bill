@@ -5,7 +5,6 @@ import { ShareCard } from '../components/ShareCard'
 import { Button } from '../components/Button'
 import { copy } from '../copy'
 import { localeForCurrency } from '../format'
-import { CopyIcon } from '../icons'
 import { captureShareImage } from '../share/captureShareImage'
 import { buildShareText } from '../share/shareText'
 
@@ -73,10 +72,7 @@ export function SummaryScreen({ bill }: SummaryScreenProps) {
 
       <div className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row">
         <Button variant="primary" onClick={handleCopyText}>
-          <span className="flex items-center justify-center gap-2">
-            <CopyIcon className="h-4 w-4" />
-            {copy.summary.copyText}
-          </span>
+          {copy.summary.copyText}
         </Button>
         <Button variant="secondary" onClick={handleDownloadImage}>
           {copy.summary.downloadImage}
