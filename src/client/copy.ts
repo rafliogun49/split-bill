@@ -102,7 +102,7 @@ export const copy = {
     lineTotal: 'Line total',
     addLineItem: 'Add Line Item',
     subtotal: 'Subtotal',
-    adjustmentsHeading: 'Adjustments',
+    adjustmentsHeading: 'Adjustments — Drag to reorder',
     adjustmentName: 'Adjustment name',
     adjustmentFallbackName: 'adjustment',
     adjustmentKind: 'Adjustment type',
@@ -117,7 +117,8 @@ export const copy = {
     removeLineItem: 'Remove',
     removeAdjustment: 'Remove',
     total: 'Total',
-    continueToDiners: 'Diners',
+    continueToDiners: 'Continue to Diners',
+    scannedBadge: 'Scanned',
   },
   dinerSetup: {
     heading: 'Diners',
@@ -147,7 +148,7 @@ export const copy = {
     incompleteSplitHeading: 'Incomplete Split',
     incompleteSplitTrailer: 'unclaimed',
     divideRemainder: 'Split the rest between everyone',
-    continueToSummary: 'Summary',
+    continueToSummary: 'Continue to Summary',
   },
   summary: {
     heading: 'Summary',

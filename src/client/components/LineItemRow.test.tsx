@@ -18,33 +18,13 @@ function noop() {}
 // way a live onChange -> re-render loop behaves.
 function StatefulLineItemRow({ initial }: { initial: LineItem }) {
   const [item, setItem] = useState(initial)
-  return (
-    <LineItemRow
-      item={item}
-      currency={currency}
-      canMoveUp={false}
-      canMoveDown={false}
-      onChange={setItem}
-      onRemove={noop}
-      onMoveUp={noop}
-      onMoveDown={noop}
-    />
-  )
+  return <LineItemRow item={item} currency={currency} onChange={setItem} onRemove={noop} />
 }
 
 describe('LineItemRow', () => {
   it('renders the line item name, quantity and line total', () => {
     const { getByDisplayValue, getByRole, getByLabelText } = render(
-      <LineItemRow
-        item={baseItem()}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={false}
-        onChange={noop}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
+      <LineItemRow item={baseItem()} currency={currency} onChange={noop} onRemove={noop} />,
     )
     expect(getByDisplayValue('Nasi Goreng Spesial')).toBeInTheDocument()
     expect(getByRole('group', { name: 'Nasi Goreng Spesial' })).toHaveTextContent('1')
@@ -54,16 +34,7 @@ describe('LineItemRow', () => {
   it('renames the line item', () => {
     const onChange = vi.fn()
     const { getByDisplayValue } = render(
-      <LineItemRow
-        item={baseItem()}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={false}
-        onChange={onChange}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
+      <LineItemRow item={baseItem()} currency={currency} onChange={onChange} onRemove={noop} />,
     )
     fireEvent.change(getByDisplayValue('Nasi Goreng Spesial'), { target: { value: 'Es Teh Manis' } })
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ label: 'Es Teh Manis' }))
@@ -71,16 +42,7 @@ describe('LineItemRow', () => {
 
   it('quantity is entered via a Stepper, not a free-text field', () => {
     const { queryByLabelText, getByRole } = render(
-      <LineItemRow
-        item={baseItem()}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={false}
-        onChange={noop}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
+      <LineItemRow item={baseItem()} currency={currency} onChange={noop} onRemove={noop} />,
     )
     expect(queryByLabelText(/quantity/i, { selector: 'input, textarea' })).not.toBeInTheDocument()
     expect(getByRole('button', { name: /increase quantity.*nasi goreng spesial/i })).toBeInTheDocument()
@@ -89,16 +51,7 @@ describe('LineItemRow', () => {
 
   it('disables the stepper decrement control once quantity reaches zero, so it can never go negative', () => {
     const { getByRole } = render(
-      <LineItemRow
-        item={baseItem({ quantity: 0 })}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={false}
-        onChange={noop}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
+      <LineItemRow item={baseItem({ quantity: 0 })} currency={currency} onChange={noop} onRemove={noop} />,
     )
     expect(getByRole('button', { name: /decrease quantity.*nasi goreng spesial/i })).toBeDisabled()
   })
@@ -117,16 +70,7 @@ describe('LineItemRow', () => {
   it('lets the line total be overridden independently of quantity and unit price', () => {
     const onChange = vi.fn()
     const { getByLabelText } = render(
-      <LineItemRow
-        item={baseItem({ amount: 90000, quantity: 1 })}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={false}
-        onChange={onChange}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
+      <LineItemRow item={baseItem({ amount: 90000, quantity: 1 })} currency={currency} onChange={onChange} onRemove={noop} />,
     )
     const lineTotal = getByLabelText(/line total/i)
     fireEvent.focus(lineTotal)
@@ -138,36 +82,10 @@ describe('LineItemRow', () => {
   it('calls onRemove when the delete action is pressed', () => {
     const onRemove = vi.fn()
     const { getByRole } = render(
-      <LineItemRow
-        item={baseItem()}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={false}
-        onChange={noop}
-        onRemove={onRemove}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
+      <LineItemRow item={baseItem()} currency={currency} onChange={noop} onRemove={onRemove} />,
     )
     fireEvent.click(getByRole('button', { name: /remove/i }))
     expect(onRemove).toHaveBeenCalledOnce()
-  })
-
-  it('disables move up/down at the ends of the list', () => {
-    const { getByRole } = render(
-      <LineItemRow
-        item={baseItem()}
-        currency={currency}
-        canMoveUp={false}
-        canMoveDown={true}
-        onChange={noop}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
-    )
-    expect(getByRole('button', { name: /move up/i })).toBeDisabled()
-    expect(getByRole('button', { name: /move down/i })).toBeEnabled()
   })
 
   it('does not corrupt the unit price after quantity passes through zero via the stepper', () => {
@@ -184,18 +102,7 @@ describe('LineItemRow', () => {
   })
 
   it('has no WCAG AAA violations', async () => {
-    const { container } = render(
-      <LineItemRow
-        item={baseItem()}
-        currency={currency}
-        canMoveUp
-        canMoveDown
-        onChange={noop}
-        onRemove={noop}
-        onMoveUp={noop}
-        onMoveDown={noop}
-      />,
-    )
+    const { container } = render(<LineItemRow item={baseItem()} currency={currency} onChange={noop} onRemove={noop} />)
     expect(await axe(container)).toHaveNoViolations()
   })
 })

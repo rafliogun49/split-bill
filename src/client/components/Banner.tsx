@@ -7,14 +7,15 @@ export interface BannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'class
 }
 
 const fillByVariant: Record<BannerVariant, string> = {
-  neutral: 'bg-surface-container-lowest',
+  neutral: 'bg-diner-1',
   alert: 'bg-error-container',
 }
 
-// DESIGN.md §8: neutral (white) and alert (error-container) only. The
-// `sr-only` prefix and the `alert` vs `status` role carry the distinction
-// in text and semantics, not only in fill — a Diner who can't perceive the
-// colour still knows which kind of Banner this is.
+// DESIGN.md screen 5 / Standalone.html: neutral (diner-1 blue, "all clear")
+// and alert (error-container) only. The `sr-only` prefix and the `alert` vs
+// `status` role carry the distinction in text and semantics, not only in
+// fill — a Diner who can't perceive the colour still knows which kind of
+// Banner this is.
 export function Banner({ variant, children, ...props }: BannerProps) {
   return (
     <div

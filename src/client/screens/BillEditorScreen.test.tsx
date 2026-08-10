@@ -118,7 +118,7 @@ describe('BillEditorScreen', () => {
     const onContinue = vi.fn()
     const { getByRole, getAllByText } = render(<BillEditorScreen bill={bill} onBillChange={noop} onContinue={onContinue} />)
     expect(getAllByText('Rp 90.000').length).toBeGreaterThan(0)
-    fireEvent.click(getByRole('button', { name: 'Diners' }))
+    fireEvent.click(getByRole('button', { name: 'Continue to Diners' }))
     expect(onContinue).toHaveBeenCalledOnce()
   })
 

@@ -101,7 +101,7 @@ describe('AssignmentScreen', () => {
   it('blocks the onward action to Summary while the Split is incomplete', () => {
     const bill = emptyBill({ diners: [diner('a', 'Alice', 0)], lineItems: [lineItem('1', 'Pizza', 18000)] })
     const { getByRole } = render(<AssignmentScreen bill={bill} onBillChange={noop} onContinue={noop} />)
-    expect(getByRole('button', { name: 'Summary' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Continue to Summary' })).toBeDisabled()
   })
 
   it('enables the onward action once the Split is complete and calls onContinue', () => {
@@ -111,7 +111,7 @@ describe('AssignmentScreen', () => {
     })
     const onContinue = vi.fn()
     const { getByRole } = render(<AssignmentScreen bill={bill} onBillChange={noop} onContinue={onContinue} />)
-    const button = getByRole('button', { name: 'Summary' })
+    const button = getByRole('button', { name: 'Continue to Summary' })
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(onContinue).toHaveBeenCalledOnce()

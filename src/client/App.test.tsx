@@ -256,7 +256,7 @@ describe('App', () => {
     it('browser back from Diner setup returns to the Bill editor', async () => {
       const { getByRole, getByText } = render(<App />)
       fireEvent.click(getByRole('button', { name: 'Enter manually instead' }))
-      fireEvent.click(getByRole('button', { name: 'Diners' }))
+      fireEvent.click(getByRole('button', { name: 'Continue to Diners' }))
       expect(getByText('No Diners yet. Add the first one above.')).toBeInTheDocument()
 
       window.history.back()
@@ -401,7 +401,7 @@ describe('App', () => {
       expect(app.getByRole('button', { name: 'Copy text' })).toBeInTheDocument()
       // Nothing on this route can step back into the editor, Diner setup or
       // Assignment — SummaryScreen carries no such controls at all.
-      expect(app.queryByRole('button', { name: 'Diners' })).not.toBeInTheDocument()
+      expect(app.queryByRole('button', { name: 'Continue to Diners' })).not.toBeInTheDocument()
       expect(app.queryByRole('button', { name: /add line item/i })).not.toBeInTheDocument()
     })
 
