@@ -82,11 +82,21 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(16px) rotate(0deg)' },
           '100%': { opacity: '1', transform: 'translateY(0) rotate(-3deg)' },
         },
+        // Issue #46: the scan-line sweeping down ProgressCard's receipt
+        // illustration — DESIGN.md §5's Parsing carve-out, mirroring
+        // vibrant-neobrutalism-mockup.md §3's `@keyframes scan{0%{top:0}100%{top:100%}}`.
+        // The illustration wrapper is `overflow-hidden`, so the bar clips at
+        // the bottom edge exactly as in the mockup rather than escaping it.
+        'receipt-scan': {
+          '0%': { top: '0%' },
+          '100%': { top: '100%' },
+        },
       },
       animation: {
         'progress-indeterminate': 'progress-indeterminate 1.2s ease-in-out infinite',
         'fade-slide-up': 'fade-slide-up 500ms ease-out',
         'receipt-in': 'receipt-in 600ms ease-out',
+        'receipt-scan': 'receipt-scan 1.8s linear infinite',
       },
     },
   },
