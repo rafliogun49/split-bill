@@ -8,8 +8,8 @@ export const copy = {
     exit: 'Exit',
   },
   start: {
-    tagline: 'Photograph the receipt. Tag who had what.',
-    photographReceipt: 'Photograph receipt',
+    tagline: 'Scan the receipt. Tag who had what.',
+    photographReceipt: 'Scan receipt',
     enterManually: 'Enter manually',
     photoNeverStored: 'Your photo is never stored.',
     resume: 'Resume',
@@ -21,7 +21,7 @@ export const copy = {
     howItWorksTitle: 'How it works',
     howItWorks: [
       {
-        title: 'Photograph the receipt',
+        title: 'Scan the receipt',
         body: 'Snap a photo, or enter items by hand. Either way, nothing leaves your device.',
       },
       {
@@ -51,8 +51,8 @@ export const copy = {
     footerTagline: 'No accounts. Nothing leaves your device.',
   },
   capture: {
-    heading: 'Photograph receipt',
-    cameraLabel: 'Take photo',
+    heading: 'Scan receipt',
+    cameraLabel: 'Scan photo',
     libraryLabel: 'Choose from library',
     dropzoneLabel: 'Drag a photo here, or choose a file',
     dropzoneHint: 'JPEG or PNG',

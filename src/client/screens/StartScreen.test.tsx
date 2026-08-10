@@ -16,11 +16,16 @@ function renderScreen(hasActiveBill: boolean) {
 
 describe('StartScreen', () => {
   describe('with no Bill in progress', () => {
-    it('presents photographing the receipt ahead of manual entry', () => {
+    it('presents scanning the receipt ahead of manual entry', () => {
       const { getAllByRole } = renderScreen(false)
       const buttons = getAllByRole('button')
-      expect(buttons[0]).toHaveTextContent('Photograph receipt')
+      expect(buttons[0]).toHaveTextContent('Scan receipt')
       expect(buttons[1]).toHaveTextContent('Enter manually')
+    })
+
+    it('says Scan, never Photograph, anywhere on the landing page', () => {
+      const { container } = renderScreen(false)
+      expect(container).not.toHaveTextContent(/photograph/i)
     })
 
     it('shows the promise that the photo is never stored', () => {
@@ -30,7 +35,7 @@ describe('StartScreen', () => {
 
     it('calls onPhotograph and onEnterManually', () => {
       const { getByRole, onPhotograph, onEnterManually } = renderScreen(false)
-      fireEvent.click(getByRole('button', { name: 'Photograph receipt' }))
+      fireEvent.click(getByRole('button', { name: 'Scan receipt' }))
       fireEvent.click(getByRole('button', { name: 'Enter manually' }))
       expect(onPhotograph).toHaveBeenCalledOnce()
       expect(onEnterManually).toHaveBeenCalledOnce()
@@ -40,6 +45,7 @@ describe('StartScreen', () => {
       const { getByRole, getByText } = renderScreen(false)
       expect(getByRole('heading', { name: 'How it works' })).toBeInTheDocument()
       expect(getByRole('heading', { name: 'Why Split Bill' })).toBeInTheDocument()
+      expect(getByText('Scan the receipt')).toBeInTheDocument()
       expect(getByText('Tag who had what')).toBeInTheDocument()
       expect(getByText('Nothing stored')).toBeInTheDocument()
     })
