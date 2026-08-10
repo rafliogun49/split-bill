@@ -80,11 +80,11 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         // Same shape, but lands on the receipt illustration's resting tilt
-        // (`-rotate-3`) instead of no rotation, so entrance hands off to that
-        // utility class cleanly too.
+        // (`-rotate-2`, DESIGN.md §8 Ornament "Rotated card") instead of no
+        // rotation, so entrance hands off to that utility class cleanly too.
         'receipt-in': {
           '0%': { opacity: '0', transform: 'translateY(16px) rotate(0deg)' },
-          '100%': { opacity: '1', transform: 'translateY(0) rotate(-3deg)' },
+          '100%': { opacity: '1', transform: 'translateY(0) rotate(-2deg)' },
         },
       },
       animation: {

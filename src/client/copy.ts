@@ -9,47 +9,45 @@ export const copy = {
     history: 'History',
   },
   start: {
-    tagline: 'Scan the receipt. Tag who had what.',
-    photographReceipt: 'Scan receipt',
-    enterManually: 'Enter manually',
-    photoNeverStored: 'Your photo is never stored.',
-    resume: 'Resume',
-    newBill: 'New Bill',
+    headline: 'Split the bill, not the friendship',
+    returningTitle: 'You have a Bill in progress',
+    // "Scan", never "Photograph" — issue #23's copy correction; kept even
+    // though the mockup's own hero subhead says "Photograph".
+    tagline: 'Scan a receipt or type it in — Split Bill figures out who owes what, in seconds.',
+    photographReceipt: 'Scan a receipt',
+    enterManually: 'Enter manually instead',
+    photoNeverStored: 'Your receipt photo is never stored.',
+    resume: 'Resume this Bill',
+    newBill: 'Start a New Bill',
     newBillWarningTitle: "This discards the Bill you're working on",
-    newBillWarningBody: 'Starting a New Bill discards the current Bill. This cannot be undone.',
+    newBillWarningBody: 'Starting a New Bill discards the one in progress. This cannot be undone.',
     confirmNewBill: 'Discard and start new',
     cancelNewBill: 'Cancel',
     howItWorksTitle: 'How it works',
     howItWorks: [
       {
-        title: 'Scan the receipt',
-        body: 'Snap a photo, or enter items by hand. Either way, nothing leaves your device.',
+        title: 'Snap or type',
+        body: 'the Line Items on your receipt',
       },
       {
-        title: 'Tag who had what',
-        body: 'Assign each Line Item to a Diner. Shared plates split between everyone with a tap.',
+        title: 'Add Diners',
+        body: 'tap who claims each item',
       },
       {
-        title: 'Get your Split',
-        body: 'Adjustments are shared pro-rata by what each Diner ordered — automatically, every time.',
+        title: 'Get a Summary',
+        body: 'and share it',
       },
     ],
-    featuresTitle: 'Why Split Bill',
-    features: [
-      {
-        title: 'Nothing stored',
-        body: 'No accounts, no server holding your Bill. It exists only on this device.',
-      },
-      {
-        title: 'Fair by default',
-        body: 'The Split accounts for exactly what each Diner ordered, not an even share.',
-      },
-      {
-        title: 'No sign-up',
-        body: 'Open it and start. No account, no install, nothing to wait on.',
-      },
-    ],
-    footerTagline: 'No accounts. Nothing leaves your device.',
+    features: ['No accounts. Nothing leaves your browser.', 'Works in IDR, SGD, USD, EUR, GBP, JPY, AUD, MYR.'],
+    footerNote: 'Your receipt photo is never stored — nothing is uploaded to a server.',
+    receiptPreview: {
+      place: 'The Warung',
+      items: [
+        { name: 'Nasi Goreng ×2', amount: '13.00' },
+        { name: 'Iced Tea ×3', amount: '9.00' },
+      ],
+      total: '$25.89',
+    },
   },
   capture: {
     heading: 'Scan receipt',
