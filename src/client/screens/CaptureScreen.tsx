@@ -45,12 +45,33 @@ export function CaptureScreen({ onCapture, onEnterManually }: CaptureScreenProps
     <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-10">
       <h1 className="text-headline-md uppercase text-on-surface">{copy.capture.heading}</h1>
 
-      {/* Mobile: camera is the primary affordance, library beside it. */}
+      {/* Mobile: camera is the primary affordance, library beside it. The
+          dark frame + corner brackets are viewfinder ornament only (DESIGN.md
+          screen 2; mockup §2 "Capture") — the Button inside is the same
+          capture trigger, unchanged. */}
       <div className="flex flex-col gap-3 lg:hidden">
-        <Button variant="primary" size="hero" onClick={() => cameraInputRef.current?.click()}>
-          <CameraIcon className="h-16 w-16" />
-          <span className="text-headline-sm uppercase">{copy.capture.cameraLabel}</span>
-        </Button>
+        <div className="relative border border-pure-black bg-on-surface p-4">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-2 top-2 h-7 w-7 border-l border-t border-primary-container"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-2 top-2 h-7 w-7 border-r border-t border-primary-container"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-2 left-2 h-7 w-7 border-b border-l border-primary-container"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-2 right-2 h-7 w-7 border-b border-r border-primary-container"
+          />
+          <Button variant="primary" size="hero" onClick={() => cameraInputRef.current?.click()}>
+            <CameraIcon className="h-16 w-16" />
+            <span className="text-headline-sm uppercase">{copy.capture.cameraLabel}</span>
+          </Button>
+        </div>
         <input
           ref={cameraInputRef}
           name="camera-photo"

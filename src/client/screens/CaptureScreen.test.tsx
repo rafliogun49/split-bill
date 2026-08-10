@@ -72,6 +72,14 @@ describe('CaptureScreen', () => {
     expect(getByText('Your photo is never stored.')).toBeInTheDocument()
   })
 
+  it('frames the mobile Scan photo button in camera-viewfinder styling with four corner brackets, per DESIGN.md screen 2', () => {
+    const { getByRole } = render(<CaptureScreen onCapture={vi.fn()} onEnterManually={vi.fn()} />)
+    const scanButton = getByRole('button', { name: 'Scan photo' })
+    const viewfinder = scanButton.closest('.bg-on-surface') as HTMLElement
+    expect(viewfinder).toBeInTheDocument()
+    expect(viewfinder.querySelectorAll('.border-primary-container')).toHaveLength(4)
+  })
+
   describe('webcam', () => {
     it('starts the camera stream when opened', async () => {
       const getUserMedia = vi.fn(async () => ({ getTracks: () => [] }) as unknown as MediaStream)
