@@ -49,6 +49,23 @@ describe('StartScreen', () => {
       expect(getByText('Tag who had what')).toBeInTheDocument()
       expect(getByText('Nothing stored')).toBeInTheDocument()
     })
+
+    it('colours the three How-it-works number badges diner-1/2/3', () => {
+      const { container } = renderScreen(false)
+      expect(container.querySelector('.bg-diner-1')).toBeInTheDocument()
+      expect(container.querySelector('.bg-diner-2')).toBeInTheDocument()
+      expect(container.querySelector('.bg-diner-3')).toBeInTheDocument()
+    })
+
+    it('carries the landing-only ornament (folded corner, zigzag divider, rotated receipt card)', () => {
+      const { container } = renderScreen(false)
+      // Folded corner: border-triangle trick on the hero card.
+      expect(container.querySelector('.border-l-transparent')).toBeInTheDocument()
+      // Zigzag divider: a serrated clip-path polygon between hero and How it works.
+      expect(container.querySelector('[style*="polygon("]')).toBeInTheDocument()
+      // Rotated "sticky note" receipt-preview card, desktop only.
+      expect(container.querySelector('.-rotate-2')).toBeInTheDocument()
+    })
   })
 
   describe('with a Bill in progress', () => {
@@ -92,6 +109,14 @@ describe('StartScreen', () => {
       expect(onNewBill).not.toHaveBeenCalled()
       expect(getByRole('button', { name: 'Resume' })).toBeInTheDocument()
       expect(queryByText(/discards the current/i)).not.toBeInTheDocument()
+    })
+
+    it('carries none of the landing page ornament or motion', () => {
+      const { container } = renderScreen(true)
+      expect(container.querySelector('.border-l-transparent')).not.toBeInTheDocument()
+      expect(container.querySelector('[style*="polygon("]')).not.toBeInTheDocument()
+      expect(container.querySelector('.-rotate-2')).not.toBeInTheDocument()
+      expect(container.querySelector('[class*="animate-"]')).not.toBeInTheDocument()
     })
   })
 
