@@ -63,12 +63,20 @@ export default {
     boxShadow,
     extend: {
       keyframes: {
-        // ProgressCard's indeterminate fill (DESIGN.md screen 3): a
-        // sliding block rather than a percentage, since the stage it
-        // represents has no knowable completion fraction.
-        'progress-indeterminate': {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(400%)' },
+        // ProgressCard's receipt illustration (DESIGN.md screen 3 /
+        // Standalone.html screen 3): a scan-line sweeping top-to-bottom
+        // rather than a percentage, since the parsing stage it represents
+        // has no knowable completion fraction.
+        scan: {
+          '0%': { top: '0%' },
+          '100%': { top: '100%' },
+        },
+        // ProgressCard's active-step badge blink, matching the mockup's own
+        // keyframe exactly (distinct timing/opacity floor from Tailwind's
+        // built-in `animate-pulse`).
+        blink: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.25' },
         },
         // Issue #23: entrance for Start's landing hero and its How-it-works /
         // Features cards — DESIGN.md §5's other named carve-out. One-shot, no
@@ -88,7 +96,8 @@ export default {
         },
       },
       animation: {
-        'progress-indeterminate': 'progress-indeterminate 1.2s ease-in-out infinite',
+        scan: 'scan 1.8s linear infinite',
+        blink: 'blink 1s ease-in-out infinite',
         'fade-slide-up': 'fade-slide-up 500ms ease-out',
         'receipt-in': 'receipt-in 600ms ease-out',
       },
