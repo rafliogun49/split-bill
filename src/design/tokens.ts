@@ -5,22 +5,22 @@
 export const colors = {
   transparent: 'transparent',
   current: 'currentColor',
-  background: '#FFFFFF',
-  'surface-container-lowest': '#FFFFFF',
-  'surface-variant': '#E2E2E2',
+  background: '#EDE6DC',
+  'surface-container-lowest': '#FFF7ED',
+  'surface-variant': '#E7E7E7',
   'pure-black': '#000000',
-  'on-surface': '#000000',
-  'on-background': '#000000',
-  'on-surface-variant': '#424750',
-  'primary-container': '#8AB4F8',
-  'error-container': '#FCA5A5',
-  disabled: '#E5E5E5',
-  'diner-1': '#FDE68A',
-  'diner-2': '#FDBA74',
-  'diner-3': '#F9A8D4',
-  'diner-4': '#A7F3D0',
-  'diner-5': '#C4B5FD',
-  'diner-6': '#A5F3FC',
+  'on-surface': '#1A1720',
+  'on-background': '#1A1720',
+  'on-surface-variant': '#4A4458',
+  'primary-container': '#FF936A',
+  'error-container': '#FF7E8E',
+  disabled: '#E7E7E7',
+  'diner-1': '#66D4FC',
+  'diner-2': '#A4D589',
+  'diner-3': '#EFA9E8',
+  'diner-4': '#E6BE68',
+  'diner-5': '#61DCC7',
+  'diner-6': '#B5BCFF',
 } as const
 
 export type ColorToken = keyof typeof colors
@@ -64,6 +64,16 @@ export const deletedColorTokens = [
   'cyber-yellow',
   'flamingo-pink',
 ] as const
+
+// DESIGN.md §8 Ornament: 22×22px repeating dot pattern, ink colour at 14%
+// opacity, applied once at the app-shell level (App.tsx) so it renders
+// behind every screen rather than being redrawn per-screen.
+const dotTextureSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"><circle cx="11" cy="11" r="1.5" fill="${colors['on-surface']}" fill-opacity="0.14"/></svg>`
+
+export const dotTexture = {
+  backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(dotTextureSvg)}")`,
+  backgroundSize: '22px 22px',
+} as const
 
 export const fontFamily: Record<'display' | 'body', string[]> = {
   display: ['"Archivo Black"', 'system-ui', 'sans-serif'],
