@@ -125,6 +125,7 @@ export const copy = {
   dinerSetup: {
     heading: 'Diners',
     rememberedHeading: 'Used before',
+    currentDinersHeading: 'Current Diners',
     forgetName: 'Forget',
     nameField: 'Diner name',
     namePlaceholder: 'Add a Diner',

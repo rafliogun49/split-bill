@@ -166,9 +166,54 @@ describe('DinerSetupScreen', () => {
     expect(container.querySelector('img')).not.toBeInTheDocument()
   })
 
+  it("renders each current Diner's row in their own diner-N fill, by join order", () => {
+    const bill = emptyBill({ diners: [diner('a', 'Budi', 0), diner('b', 'Sarah', 1), diner('c', 'Cara', 6)] })
+    const { container } = render(<DinerSetupScreen bill={bill} onBillChange={noop} onContinue={noop} />)
+    expect(container.querySelector('.bg-diner-1')).toBeInTheDocument()
+    expect(container.querySelector('.bg-diner-2')).toBeInTheDocument()
+    // joinIndex 6 wraps back to diner-1, alongside Budi's own diner-1 row.
+    expect(container.querySelectorAll('.bg-diner-1')).toHaveLength(2)
+  })
+
+  it('never uses primary-container as a Diner row fill', () => {
+    const bill = emptyBill({ diners: [diner('a', 'Budi', 0), diner('b', 'Sarah', 1)] })
+    const { container } = render(<DinerSetupScreen bill={bill} onBillChange={noop} onContinue={noop} />)
+    // Diner rows are the only elements carrying shadow-sm in this screen (the
+    // Continue button below legitimately uses primary-container, and isn't one).
+    const rows = container.querySelectorAll('.shadow-sm')
+    expect(rows).toHaveLength(2)
+    rows.forEach((row) => {
+      expect(row.className).toMatch(/\bbg-diner-\d\b/)
+      expect(row.className).not.toMatch(/bg-primary-container/)
+    })
+  })
+
+  it('shows the Payer via a ribbon tag rather than the Diner-row toggle button', () => {
+    const bill = emptyBill({ diners: [diner('a', 'Budi', 0), diner('b', 'Sarah', 1)], payerId: 'a' })
+    const { getByRole, getByText } = render(<DinerSetupScreen bill={bill} onBillChange={noop} onContinue={noop} />)
+    expect(getByText('Payer')).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Mark as Payer — Sarah' })).toBeInTheDocument()
+  })
+
   it('has no WCAG AAA violations with remembered names, Diners and a Payer present', async () => {
     localStorage.setItem('split-bill:diner-names', JSON.stringify({ version: 1, names: ['Sarah'] }))
     const bill = emptyBill({ diners: [diner('a', 'Budi')], payerId: 'a' })
+    const { container } = render(<DinerSetupScreen bill={bill} onBillChange={noop} onContinue={noop} />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('has no WCAG AAA violations with six current Diners spanning all six diner-N fills', async () => {
+    const bill = emptyBill({
+      diners: [
+        diner('a', 'Budi', 0),
+        diner('b', 'Sarah', 1),
+        diner('c', 'Cara', 2),
+        diner('d', 'Dedi', 3),
+        diner('e', 'Eka', 4),
+        diner('f', 'Farah', 5),
+      ],
+      payerId: 'd',
+    })
     const { container } = render(<DinerSetupScreen bill={bill} onBillChange={noop} onContinue={noop} />)
     expect(await axe(container)).toHaveNoViolations()
   })
