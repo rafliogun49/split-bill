@@ -323,7 +323,7 @@ flow above.
 
 **9 · Incomplete Split** — persistent `alert` Banner naming the unclaimed Line Items and their value, with a one-tap *split these between everyone*. **Blocks sharing** — it is not a warning that can be dismissed.
 
-**10 · Summary** — Payer named and what they're owed, then each Diner's Total with an itemised breakdown, then the reconciliation line. Share as text, share as image, copy to clipboard on desktop.
+**10 · Summary** — Payer named and what they're owed, then each Diner's Total with an itemised breakdown, then the reconciliation line. No native share sheet: a "Copy text" button always copies the plain-text summary to the clipboard, and a "Download image" button always saves the share PNG directly.
 
 **11 · Share image** — the one non-responsive surface. Rendered from the `ShareCard` DOM node to PNG at a fixed width, so it must read standalone: Place and Date at the top, every Diner's Total with items, who to pay, and no app chrome, buttons or navigation. Inline the fonts — a webfont that hasn't loaded renders into the PNG as a fallback.
 
