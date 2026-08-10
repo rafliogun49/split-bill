@@ -112,16 +112,6 @@ export function UploadIcon({ className }: IconProps) {
   )
 }
 
-// Failure's large graphic above the headline, inside the alert band
-// (DESIGN.md §9 screen 4; mockup §4 "Failure"). DESIGN.md §8 icon set: `warning`.
-export function WarningIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M12 2 23 21H1L12 2Z" />
-    </svg>
-  )
-}
-
 // TopBar's entry point into History (DESIGN.md §8 icon set: `clock`/list
 // glyph for the archive) — a clock face rather than a list glyph, since the
 // point of a History row is *when* a Bill was archived as much as what's in
